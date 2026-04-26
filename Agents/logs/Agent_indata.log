@@ -1,0 +1,4 @@
+2026-04-26 20:49:49,895 - Agent_indata - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_-3824907433837067992' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'query', 'priority': 'user', 'Agent_data': {'query_type': 'Base', 'output_type': 'table', 'query_data': {'table_name': '成绩表'}}, 'timeout': 30}
+2026-04-26 20:49:49,896 - Agent_indata - INFO - 处理 Agent_indata 请求
+2026-04-26 20:49:49,897 - Agent_indata - INFO - 任务类型: query, 查询类型: Base, 输出类型: table
+2026-04-26 20:49:49,899 - Agent_indata - INFO - 返回结果: {'success': True, 'Agent_id': 'Agent_indata', 'session_id': 'session_-3824907433837067992', 'session_datetime': '2024-01-01T00:00:00Z', 'context': {'task_type': 'query', 'priority': 'user', 'Agent_data': {'query_type': 'Base', 'output_type': 'table', 'query_data': {'table': [{'姓名': '张三', '成绩': '90', '班级': 'A班'}, {'姓名': '李四', '成绩': '85', '班级': 'A班'}, {'姓名': '王五', '成绩': '88', '班级': 'A班'}]}}}}

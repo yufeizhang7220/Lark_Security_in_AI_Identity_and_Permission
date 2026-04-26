@@ -8,6 +8,15 @@ SYSTEM_NAME = "External Search Agent"
 SYSTEM_VERSION = "1.0.0"
 DEBUG = True
 
+# ============ API 服务配置 ============
+API_CONFIG = {
+    "host": "0.0.0.0",
+    "port": 8787,
+    "agent_id": "External-Search-Agent",
+    "api_endpoint": "/api/query",
+    "health_endpoint": "/health"
+}
+
 # ============ JWT 配置 ============
 JWT_CONFIG = {
     "algorithm": "HS256",

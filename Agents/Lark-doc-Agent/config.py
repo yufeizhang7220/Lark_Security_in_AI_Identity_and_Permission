@@ -22,7 +22,7 @@ OTHER_AGENTS = {
     "enterprise_data_agent": {
         "name": "企业数据Agent",
         "agent_id": "Enterprise-Data-Agent",
-        "url": "http://localhost:8787/Enterprise-Data-Agent"
+        "url": "http://localhost:8787/Agent_indata"
     },
     "external_search_agent": {
         "name": "外部检索Agent",

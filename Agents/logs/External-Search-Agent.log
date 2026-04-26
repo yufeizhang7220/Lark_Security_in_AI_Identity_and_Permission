@@ -1,0 +1,28 @@
+2026-04-26 20:40:36,300 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_6678336318166553805' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 3, 'source': '公开天气信息平台', 'query_data': '明日当地天气晴朗情况'}, 'timeout': 30}
+2026-04-26 20:40:36,300 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:40:36,301 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明日当地天气晴朗情况
+2026-04-26 20:40:36,301 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_-6311763168611487252' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 5, 'source': 'web', 'query_data': '明天本地的天气情况，包括是否天晴、温度、风力、降水概率、紫外线强度相关信息'}, 'timeout': 30}
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_-6311763168611487252' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 5, 'source': 'web', 'query_data': '明天本地的天气情况，包括是否天晴、温度、风力、降水概率、紫外线强度相关信息'}, 'timeout': 30}
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明天本地的天气情况，包括是否天晴、温度、风力、降水概率、紫外线强度相关信息
+2026-04-26 20:40:49,938 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明天本地的天气情况，包括是否天晴、温度、风力、降水概率、紫外线强度相关信息
+2026-04-26 20:40:49,938 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:40:49,938 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:41:04,246 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_7376144367132736276' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 5, 'source': 'web', 'query_data': '明天本地天气是否天晴'}, 'timeout': 30}
+2026-04-26 20:41:04,246 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_7376144367132736276' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 5, 'source': 'web', 'query_data': '明天本地天气是否天晴'}, 'timeout': 30}
+2026-04-26 20:41:04,246 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_7376144367132736276' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'limit_num': 5, 'source': 'web', 'query_data': '明天本地天气是否天晴'}, 'timeout': 30}
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明天本地天气是否天晴
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明天本地天气是否天晴
+2026-04-26 20:41:04,247 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: 明天本地天气是否天晴
+2026-04-26 20:41:04,248 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:41:04,248 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:41:04,248 - External-Search-Agent - ERROR - 处理请求出错: 'str' object has no attribute 'get'
+2026-04-26 20:48:00,744 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id='Lark-doc-Agent' session_id='session_-5564777879703588385' session_datetime='2024-01-01T00:00:00Z' context={'task_type': 'search', 'action': 'web_search', 'priority': 'user', 'Agent_data': {'query_type': 'web', 'output_type': 'json', 'query_data': {'query': '明天的天气情况', 'num_results': 3}}, 'timeout': 30}
+2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: {'query': '明天的天气情况', 'num_results': 3}
+2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 返回结果: {'success': True, 'results': [{'title': '搜索结果 1 for 明天的天气情况', 'url': 'https://example.com/result1', 'snippet': "这是关于 '明天的天气情况' 的第 1 条搜索结果摘要"}, {'title': '搜索结果 2 for 明天的天气情况', 'url': 'https://example.com/result2', 'snippet': "这是关于 '明天的天气情况' 的第 2 条搜索结果摘要"}, {'title': '搜索结果 3 for 明天的天气情况', 'url': 'https://example.com/result3', 'snippet': "这是关于 '明天的天气情况' 的第 3 条搜索结果摘要"}], 'total': 3, 'query': '明天的天气情况'}
