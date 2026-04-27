@@ -1,0 +1,11 @@
+{
+    "Lark-doc-Agent":{
+    "AgentID":"Lark-doc-Agent",
+    "Subtype":"user",
+    "scope":"[[doc:all , tablebase:all , calendar:all , all:online]]",
+    "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU (密钥算法自定义)",
+    "iat":"1777290183 秒级时间戳",
+    "exp":"1778083200",
+    "IP":"127.0.0.1"
+    }
+}

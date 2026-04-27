@@ -1,0 +1,16 @@
+{
+    "Lark-doc-Agent":{
+    "AgentID":"Lark-doc-Agent",
+    "Subtype":"user",
+    "scope":"[doc:all , tablebase:all , calendar:all , all:online]",
+    "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU (密钥算法自定义)"
+    },
+
+    "External-Search-Agent":{
+    "AgentID":"External-Search-Agent",
+    "Subtype":"visitor",
+    "scope":"[all:online]",
+    "AgentSecret":"7s9KpR2tG8xQbA5dF4zC1vN4mH6jY0wU (密钥算法自定义)"
+    }
+    ！！！可以做一定的修改，但是请及时告知其他人，因为大家都要使用这个库！ ！！
+}

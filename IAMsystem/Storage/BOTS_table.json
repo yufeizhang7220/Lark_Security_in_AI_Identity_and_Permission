@@ -1,0 +1,68 @@
+{
+    "Agent_indata":{
+        "bot_name": "Agent_indata",
+        "API_adderess": [
+            {
+                "api":"localhost:8787/Agent_indata/api/query",
+                "description":"负责查询企业内部数据（通讯录、日历、多维表格等",
+                "scope":"[doc:read , tablebase:read , calendar:read]",
+                "required_json":{
+                        "user_input": "str 可选的用户输入",
+                        "Agent_id": "str 可选的Agent ID",
+                        "session_id": "str 可选的会话ID",
+                        "session_datetime": "str 可选的会话时间",
+                        "context": {
+                            "task_type": "str 任务类型，默认是query",
+                            "priority": "str 优先级，默认是user",
+                            "Agent_data": {
+                                "query_type": "str 查询类型，默认是Contacts，可选值：Contacts/Calendar/Base",
+                                "output_type": "str 输出类型，默认是json，可选值：json/table/pretty",
+                                "query_data": "str 查询条件，默认为空对象"
+                            },
+                            "timeout": "int 超时时间，默认30"
+                        }
+                }
+            },
+            {
+                "api":"localhost:8787/Agent_indata/health",
+                "description":"负责检查服务是否健康",
+                "scope":"[]",
+                "required_json":{}
+            }
+        ]
+    },
+    "External-Search-Agent":{
+        "bot_name": "External-Search-Agent",
+        "API_adderess": [
+            {
+                "api":"localhost:8787/External-Search-Agent/api/query",
+                "description":"负责查询外部数据（如用户信息、设备信息等）",
+                "scope":"[all:online]",
+                "required_json":{
+                    "Agent_id": "str 源Agent的ID",		
+                    "session_id": "str 会话id",			
+                    "session_datetime": "str 发送信息时间",
+                    "context": {
+                        "task_type":"str 任务类型",		
+                        "action": "str 任务操作",	                
+                        "priority": "str 该命令的权限",		
+                        "Agent_data":{
+                            "limit_num": "int 查询数量",					
+                            "source": "str 查询来源",
+                            "query_data": "str 查询内容/返回内容"
+                        },
+                        "timeout": "int 超时时间"						 	
+                    }
+                }
+            },
+            {
+                "api":"localhost:8787/External-Search-Agent/health",
+                "description":"负责检查服务是否健康",
+                "scope":"[]",
+                "required_json":{}
+            }
+        ]
+    }
+}
+!!! ！！！可以做一定的修改，但是请及时告知其他人，因为大家都要使用这个库！  ！！
+因为后面agent接口可能会有变化，所以请及时沟通
