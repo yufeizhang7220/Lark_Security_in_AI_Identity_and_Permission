@@ -1,0 +1,10 @@
+{    
+    "Lark-doc-Agent":{
+    "AgentID":"Lark-doc-Agent",
+    "Subtype":"user",
+    "scope":{"doc":["all"] , "tablebase":["all"] , "calendar":["all"] , "online":["all"]},
+    "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU",
+    "registered_at":1745800000,
+    "ip": "127.0.0.1"
+    }
+}
