@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞书文档助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* 左侧输入区 1/4宽度 */
+        .left-panel {
+            width: 25%;
+            background-color: #fff;
+            border-right: 1px solid #e8e8e8;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* 右侧结果区 3/4宽度 */
+        .right-panel {
+            width: 75%;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d2129;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4e5969;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c9cdd4;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1677ff;
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c9cdd4;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 200px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1677ff;
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #4e5969;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #1677ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #4080ff;
+        }
+
+        .submit-btn:disabled {
+            background-color: #c9cdd4;
+            cursor: not-allowed;
+        }
+
+        .result-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d2129;
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #4e5969;
+            margin-right: 8px;
+        }
+
+        .result-value {
+            color: #1d2129;
+        }
+
+        .doc-link {
+            color: #1677ff;
+            text-decoration: none;
+        }
+
+        .doc-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #86909c;
+        }
+
+        .error {
+            color: #f53f3f;
+        }
+
+        .success {
+            color: #00b42a;
+        }
+
+        .log-area {
+            background-color: #f7f8fa;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .log-item {
+            margin-bottom: 4px;
+            color: #4e5969;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-panel">
+        <h1 class="panel-title">📝 飞书文档助手</h1>
+        
+        <div class="form-group">
+            <label class="form-label">文档标题</label>
+            <input type="text" class="form-input" id="title" placeholder="请输入文档标题" required>
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-item">
+                <input type="checkbox" id="use_data" checked>
+                <span>使用飞书内部数据</span>
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="use_online" checked>
+                <span>使用外部检索功能</span>
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">需求描述</label>
+            <textarea class="form-textarea" id="user_input" placeholder="请详细描述您的文档需求，比如：
+写一份2026年Q2项目总结报告，包含以下内容：
+1. 项目进度概述
+2. 关键成果展示
+3. 存在的问题和解决方案
+4. 下季度计划" required></textarea>
+        </div>
+
+        <button class="submit-btn" id="submit_btn" onclick="generateDoc()">生成飞书文档</button>
+    </div>
+
+    <div class="right-panel">
+        <h1 class="panel-title">📊 生成结果</h1>
+        <div id="result_area">
+            <div style="text-align: center; color: #86909c; padding: 100px 0;">
+                请在左侧填写文档需求，点击「生成飞书文档」按钮开始生成
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateDoc() {
+            const title = document.getElementById('title').value.trim();
+            const use_data = document.getElementById('use_data').checked;
+            const use_online = document.getElementById('use_online').checked;
+            const user_input = document.getElementById('user_input').value.trim();
+
+            if (!title || !user_input) {
+                alert('请填写文档标题和需求描述');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit_btn');
+            const resultArea = document.getElementById('result_area');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '生成中...';
+            resultArea.innerHTML = `
+                <div class="loading">
+                    <div style="font-size: 16px; margin-bottom: 8px;">🚀 正在生成文档，请稍候...</div>
+                    <div class="log-area" id="log_area"></div>
+                </div>
+            `;
+
+            const logArea = document.getElementById('log_area');
+            const addLog = (message) => {
+                logArea.innerHTML += `<div class="log-item">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+                logArea.scrollTop = logArea.scrollHeight;
+            };
+
+            try {
+                addLog('开始处理请求...');
+                addLog('正在分析用户需求...');
+
+                const response = await fetch('/Lark-doc-Agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        use_data,
+                        use_online,
+                        user_input
+                    })
+                });
+
+                addLog('正在调用工具生成内容...');
+
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    addLog('文档生成成功！');
+                    resultArea.innerHTML = `
+                        <div class="result-card">
+                            <div class="result-title">✅ 文档生成成功</div>
+                            <div class="result-item">
+                                <span class="result-label">文档标题：</span>
+                                <span class="result-value">${result.data.title}</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">飞书文档链接：</span>
+                                <a href="${result.data.doc_url}" target="_blank" class="doc-link">${result.data.doc_url}</a>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">本地保存路径：</span>
+                                <span class="result-value">${result.data.local_path}</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">使用的工具：</span>
+                                <span class="result-value">${result.data.used_tools.join(', ')}</span>
+                            </div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-title">📋 生成日志</div>
+                            <div class="log-area">
+                                ${result.data.logs.map(log => `<div class="log-item">${log}</div>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    addLog(`生成失败：${result.message}`);
+                    resultArea.innerHTML = `
+                        <div class="result-card">
+                            <div class="result-title error">❌ 生成失败</div>
+                            <div class="result-item error">
+                                ${result.message}
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                addLog(`请求失败：${error.message}`);
+                resultArea.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-title error">❌ 请求失败</div>
+                        <div class="result-item error">
+                            ${error.message}
+                        </div>
+                    </div>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '生成飞书文档';
+            }
+        }
+    </script>
+</body>
+</html>
