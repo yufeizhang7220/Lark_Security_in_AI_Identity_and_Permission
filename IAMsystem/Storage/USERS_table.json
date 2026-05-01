@@ -1,16 +1,143 @@
 {
-    "Lark-doc-Agent":{
-    "AgentID":"Lark-doc-Agent",
-    "Subtype":"user",
-    "scope":"[doc:all , tablebase:all , calendar:all , all:online]",
-    "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU (密钥算法自定义)"
+    "Test-User": {
+        "AgentID": "Test-User",
+        "Subtype": "user",
+        "scope": {
+            "doc": [
+                "read"
+            ],
+            "online": [
+                "web_search"
+            ]
+        },
+        "AgentSecret": "9c8f215ba6e8739a8ccb5806a2c51d2b",
+        "registered_at": 1777600600,
+        "ip": "127.0.0.1"
     },
-
-    "External-Search-Agent":{
-    "AgentID":"External-Search-Agent",
-    "Subtype":"visitor",
-    "scope":"[all:online]",
-    "AgentSecret":"7s9KpR2tG8xQbA5dF4zC1vN4mH6jY0wU (密钥算法自定义)"
+    "Test-Bot": {
+        "AgentID": "Test-Bot",
+        "Subtype": "bot",
+        "scope": {
+            "online": [
+                "all"
+            ]
+        },
+        "AgentSecret": "2e41233916351d32590c045fb1167a4c",
+        "registered_at": 1777600602,
+        "ip": "127.0.0.1"
+    },
+    "New-Bot": {
+        "AgentID": "New-Bot",
+        "Subtype": "bot",
+        "scope": {
+            "online": [
+                "all"
+            ]
+        },
+        "AgentSecret": "78369d9c2738886aed5b0088ff01b220",
+        "registered_at": 1777600644,
+        "ip": "127.0.0.1"
+    },
+    "string": {
+        "AgentID": "string",
+        "Subtype": "string",
+        "scope": {
+            "additionalProp1": [
+                "string"
+            ],
+            "additionalProp2": [
+                "string"
+            ],
+            "additionalProp3": [
+                "string"
+            ]
+        },
+        "AgentSecret": "75133b4719467e983e12d96be2786abd",
+        "registered_at": 1777601414,
+        "ip": "string"
+    },
+    "LogTestUser": {
+        "AgentID": "LogTestUser",
+        "Subtype": "user",
+        "scope": {
+            "doc": [
+                "read"
+            ]
+        },
+        "AgentSecret": "eb08e8bb28958afaefcbd94391974a82",
+        "registered_at": 1777601678,
+        "ip": "127.0.0.1"
+    },
+    "NewUser2026": {
+        "AgentID": "NewUser2026",
+        "Subtype": "user",
+        "scope": {
+            "doc": [
+                "read"
+            ]
+        },
+        "AgentSecret": "84d3047a8d17ef848fd1867a983ada00",
+        "registered_at": 1777601783,
+        "ip": "10.0.0.1"
+    },
+    "ZhangSan": {
+        "AgentID": "ZhangSan",
+        "Subtype": "user",
+        "scope": {
+            "doc": [
+                "read"
+            ]
+        },
+        "AgentSecret": "92c48440f3a82e82f2e472a670fe059a",
+        "registered_at": 1777601800,
+        "ip": "192.168.1.50"
+    },
+    "SearchBot": {
+        "AgentID": "SearchBot",
+        "Subtype": "bot",
+        "scope": {
+            "online": [
+                "all"
+            ]
+        },
+        "AgentSecret": "f622002575c9d5cd1daef6aef0856dc0",
+        "registered_at": 1777601810,
+        "ip": "192.168.1.50"
+    },
+    "agent": {
+        "AgentID": "agent",
+        "Subtype": "string",
+        "scope": {
+            "additionalProp1": [
+                "string"
+            ],
+            "additionalProp2": [
+                "string"
+            ],
+            "additionalProp3": [
+                "string"
+            ]
+        },
+        "AgentSecret": "367d5e2dc86c39e3322067b081a6b3ca",
+        "registered_at": 1777602146,
+        "ip": "string"
+    },
+    "xiaolizi": {
+        "AgentID": "xiaolizi",
+        "Subtype": "string",
+        "scope": {
+            "additionalProp1": [
+                "string"
+            ],
+            "additionalProp2": [
+                "string"
+            ],
+            "additionalProp3": [
+                "string"
+            ]
+        },
+        "AgentSecret": "c6218e4068ad702a179885c3307910ba",
+        "registered_at": 1777602222,
+        "ip": "string"
     }
-    ！！！可以做一定的修改，但是请及时告知其他人，因为大家都要使用这个库！ ！！
 }
