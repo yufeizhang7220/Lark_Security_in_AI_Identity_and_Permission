@@ -1,53 +1,25 @@
 {
-    "Agent_indata": {
-        "bot_name": "Agent_indata",
-        "bot_description": "企业数据 Agent，唯一有权访问飞书通讯录、日历、多维表格。负责查询企业内部数据。",
+    "Test-Bot": {
+        "bot_name": "Test-Bot",
+        "bot_description": "测试机器人，负责从公开网站获取信息。",
         "API_adderess": [
             {
-                "api_id": "data_query",
-                "api": "localhost:8787/Agent_indata/api/query",
-                "description": "负责查询企业内部数据（通讯录、日历、多维表格等）",
+                "api_id": "test_query",
+                "api": "localhost:8787/Test-Bot/api/query",
+                "description": "测试查询接口",
                 "method": "POST",
                 "scope": {
-                    "doc": ["read"],
-                    "tablebase": ["read"],
-                    "calendar": ["read"]
+                    "online": [
+                        "all"
+                    ]
                 },
-                "required_json": {
-                    "Agent_id": "str 可选的Agent ID",
-                    "session_id": "str 可选的会话ID",
-                    "session_datetime": "str 可选的会话时间,格式为%Y-%m-%d_%H:%M:%S",
-                    "context": {
-                        "task_type": "str 任务类型，query",
-                        "priority": "str 优先级，user/bot",
-                        "Agent_data": {
-                            "query_type": "str 查询类型，可选值：Contacts/Calendar/Base",
-                            "output_type": "str 输出类型，可选值：json/table/pretty",
-                            "query_data": "str 查询内容"
-                        },
-                        "timeout": "int 超时时间，单位s"
-                    }
-                },
-                "output_json": {
-                    "Agent_id": "str 可选的Agent ID",
-                    "session_id": "str 可选的会话ID",
-                    "session_datetime": "str 可选的会话时间,格式为%Y-%m-%d_%H:%M:%S",
-                    "context": {
-                        "task_type": "str 任务类型，query",
-                        "priority": "str 优先级，user/bot",
-                        "Agent_data": {
-                            "query_type": "str 查询类型，可选值：Contacts/Calendar/Base",
-                            "output_type": "str 输出类型，可选值：json/table/pretty",
-                            "query_data": "str 返回内容"
-                        },
-                        "timeout": "int 超时时间，单位s"
-                    }
-                }
+                "required_json": {},
+                "output_json": {}
             },
             {
-                "api_id": "data_health",
-                "api": "localhost:8787/Agent_indata/health",
-                "description": "负责检查服务是否健康",
+                "api_id": "test_health",
+                "api": "localhost:8787/Test-Bot/health",
+                "description": "",
                 "method": "GET",
                 "scope": {},
                 "required_json": {},
@@ -55,56 +27,45 @@
             }
         ]
     },
-    "External-Search-Agent": {
-        "bot_name": "External-Search-Agent",
-        "bot_description": "外部检索 Agent，负责从公开网站获取信息，无权访问飞书内部数据。用于搜索网页、抓取公开内容。",
+    "New-Bot": {
+        "bot_name": "New-Bot",
+        "bot_description": "新机器人",
         "API_adderess": [
             {
-                "api_id": "ext_search_query",
-                "api": "localhost:8787/External-Search-Agent/api/query",
-                "description": "负责查询外部数据（如用户信息、设备信息等）",
+                "api_id": "new_query",
+                "api": "localhost:8787/New-Bot/api",
+                "description": "",
                 "method": "POST",
-                "scope": {
-                    "online": ["all"]
-                },
-                "required_json": {
-                    "Agent_id": "str 源Agent的ID",
-                    "session_id": "str 会话id",
-                    "session_datetime": "str 发送信息时间,格式为%Y-%m-%d_%H:%M:%S",
-                    "context": {
-                        "task_type": "str 任务类型,auto",
-                        "action": "str 任务操作 web_search/fetch_content/analyze_content",
-                        "priority": "str 该命令的权限，user/bot",
-                        "Agent_data": {
-                            "limit_num": "int 查询数量",
-                            "source": "str 查询来源",
-                            "query_data": "str 查询内容/返回内容"
-                        },
-                        "timeout": "int 超时时间，单位s"
-                    }
-                },
-                "output_json": {
-                    "Agent_id": "str 源Agent的ID",
-                    "session_id": "str 会话id",
-                    "session_datetime": "str 发送信息时间,格式为%Y-%m-%d_%H:%M:%S",
-                    "context": {
-                        "task_type": "str 任务类型,auto",
-                        "action": "str 任务操作 web_search/fetch_content/analyze_content",
-                        "priority": "str 该命令的权限，user/bot",
-                        "Agent_data": {
-                            "limit_num": "int 查询数量",
-                            "source": "str 查询来源",
-                            "query_data": "str 查询内容/返回内容"
-                        },
-                        "timeout": "int 超时时间，单位s"
-                    }
-                }
-            },
+                "scope": {},
+                "required_json": {},
+                "output_json": {}
+            }
+        ]
+    },
+    "SearchBot": {
+        "bot_name": "SearchBot",
+        "bot_description": "搜索机器人，负责搜索网页内容",
+        "API_adderess": [
             {
-                "api_id": "ext_search_health",
-                "api": "localhost:8787/External-Search-Agent/health",
-                "description": "负责检查服务是否健康",
-                "method": "GET",
+                "api_id": "web_search",
+                "api": "localhost:8787/SearchBot/api/search",
+                "description": "",
+                "method": "POST",
+                "scope": {},
+                "required_json": {},
+                "output_json": {}
+            }
+        ]
+    },
+    "xiaolizi": {
+        "bot_name": "xiaolizi",
+        "bot_description": "string",
+        "API_adderess": [
+            {
+                "api_id": null,
+                "api": null,
+                "description": "",
+                "method": null,
                 "scope": {},
                 "required_json": {},
                 "output_json": {}
