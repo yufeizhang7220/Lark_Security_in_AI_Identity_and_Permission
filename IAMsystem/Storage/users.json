@@ -1,0 +1,42 @@
+{
+  "_说明": "用户/访客身份存储表，存储所有普通用户和访客身份信息",
+  "fields_说明": {
+    "agent_id": "系统生成的唯一用户ID，全局唯一",
+    "agent_name": "用户自定义名称",
+    "subtype": "身份类型：user（普通用户）/visitor（访客）",
+    "agent_secret": "bcrypt加密后的用户密钥，不可逆",
+    "scope": "用户的静态权限集合，JSON对象",
+    "ip": "注册时绑定的IP地址",
+    "registered_at": "注册时间戳（秒）",
+    "status": "状态：active（正常）/disabled（禁用）"
+  },
+  "data": [
+    {
+      "agent_id": "user_001",
+      "agent_name": "张三",
+      "subtype": "user",
+      "agent_secret": "$2b$12$EixZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ1234",
+      "scope": {
+        "doc": ["read", "write"],
+        "indata": ["read_bitable", "read_contact"],
+        "online": ["web_search"]
+      },
+      "ip": "192.168.1.100",
+      "registered_at": 1745800000,
+      "status": "active"
+    },
+    {
+      "agent_id": "visitor_001",
+      "agent_name": "外部访客",
+      "subtype": "visitor",
+      "agent_secret": "$2b$12$FjYZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ5678",
+      "scope": {
+        "doc": ["read"],
+        "online": ["web_search"]
+      },
+      "ip": "202.103.24.68",
+      "registered_at": 1745810000,
+      "status": "active"
+    }
+  ]
+}

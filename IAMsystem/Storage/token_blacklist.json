@@ -1,0 +1,27 @@
+{
+  "_说明": "AccessToken黑名单存储表，仅存储被主动撤销的Token，JWT本身是自包含的，不需要存储所有有效Token",
+  "_设计说明": "JWT Token本身包含所有需要的信息（身份、权限、过期时间），有效Token不需要存储在服务端。只有当Token被主动撤销时，才会将其jti加入黑名单，校验时优先检查该表。Token过期后可以自动从黑名单中清理。",
+  "fields_说明": {
+    "jti": "Token的唯一标识，对应JWT中的jti字段",
+    "expire_at": "Token的过期时间戳（秒），超过这个时间可以自动删除该条目",
+    "revoked_at": "撤销时间戳（秒）",
+    "revoked_by": "撤销操作的主体AgentID",
+    "revoke_reason": "撤销原因：主动撤销/权限变更/安全风险"
+  },
+  "data": [
+    {
+      "jti": "token_abc123def456",
+      "expire_at": 1745803600,
+      "revoked_at": 1745802000,
+      "revoked_by": "user_001",
+      "revoke_reason": "主动撤销"
+    },
+    {
+      "jti": "token_ghi789jkl012",
+      "expire_at": 1745810000,
+      "revoked_at": 1745805000,
+      "revoked_by": "system",
+      "revoke_reason": "安全风险，IP异常"
+    }
+  ]
+}
