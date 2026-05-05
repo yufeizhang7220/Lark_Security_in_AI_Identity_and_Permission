@@ -283,23 +283,21 @@ graph LR
 
 ```JSON
 {
+    "bot_id":"",
+    "agent_secret":"",
     "access_token": "", 
     "required_scope": {"indata": ["read"]}
 }
-```
 
-```JSON
+```
+**响应数据**：
+
+```json
 {
-    "valid": true, 
-    "scope": {}
+    "valid": true,
+    "scope": {"indata": ["read"]}
 }
 ```
-
-#### 3.2.3 撤销AccessToken
-
-**接口地址**：`POST /auth/revoke-token`
-**请求参数**：`{"agent_id": "", "agent_secret": "", "token_id": ""}`
-**响应数据**：`{"revoked": true}`
 
 ***
 

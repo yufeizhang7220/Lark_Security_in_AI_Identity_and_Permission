@@ -15,7 +15,7 @@
       "agent_id": "user_001",
       "agent_name": "张三",
       "subtype": "user",
-      "agent_secret": "$2b$12$EixZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ1234",
+      "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
       "scope": {
         "doc": ["read", "write"],
         "indata": ["read_bitable", "read_contact"],
@@ -29,7 +29,7 @@
       "agent_id": "visitor_001",
       "agent_name": "外部访客",
       "subtype": "visitor",
-      "agent_secret": "$2b$12$FjYZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ5678",
+      "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
       "scope": {
         "doc": ["read"],
         "online": ["web_search"]

@@ -4,13 +4,59 @@
   "fields_说明": {
     "jti": "Token的唯一标识，对应JWT中的jti字段",
     "expire_at": "Token的过期时间戳（秒），超过这个时间可以自动删除该条目",
-    "revoked_at": "撤销时间戳（秒）",
-    "revoked_by": "撤销操作的主体AgentID",
-    "revoke_reason": "撤销原因：主动撤销/权限变更/安全风险"
+    "revoked_at": "撤销时间戳（秒），如果为null表示还未撤销",
+    "revoked_by": "撤销操作的主体AgentID/system",
+    "revoke_reason": "撤销原因：主动撤销/权限变更/安全风险/还未撤销/到期撤销"
   },
   "data": [
     {
       "jti": "token_abc123def456",
+      "accesstoken_type": "static",
+      "AccessToken": {
+        "iss": "IAM-System",
+        "AgentID": "AgentID",
+        "iat": 1745800000,
+        "exp": null,
+        "jti": "唯一TokenID",
+        "delegated_chain": [
+          {
+            "agent_id": "UserID",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "read",
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          },
+          {
+            "agent_id": "DocAgent",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          }
+        ],
+        "scope": {
+          "doc": [
+            "write"
+          ],
+          "indata": [
+            "read_bitable"
+          ],
+          "online": []
+        },
+        "ip": "0.0.0.0",
+        "purpose": "生成一季度销售报告"
+      },
       "expire_at": 1745803600,
       "revoked_at": 1745802000,
       "revoked_by": "user_001",
@@ -18,10 +64,63 @@
     },
     {
       "jti": "token_ghi789jkl012",
+      "accesstoken_type": "dynamic",
+      "AccessToken": {
+        "iss": "IAM-System",
+        "AgentID": "AgentID",
+        "iat": 1745800000,
+        "exp": 1745810000,
+        "jti": "唯一TokenID",
+        "delegated_chain": [
+          {
+            "agent_id": "UserID",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "read",
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          },
+          {
+            "agent_id": "DocAgent",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          }
+        ],
+        "scope": {
+          "doc": [
+            "write"
+          ],
+          "indata": [
+            "read_bitable"
+          ],
+          "online": []
+        },
+        "ip": "127.0.0.1",
+        "purpose": "生成一季度销售报告"
+      },
       "expire_at": 1745810000,
-      "revoked_at": 1745805000,
-      "revoked_by": "system",
-      "revoke_reason": "安全风险，IP异常"
+      "revoked_at": null,
+      "revoked_by": "",
+      "revoke_reason": "还未撤销"
+    },
+    {
+      "jti": "40f99f914f534afa8b61383388875399",
+      "expire_at": 1777950955,
+      "revoked_at": 1777864555,
+      "revoked_by": "visitor_001",
+      "revoke_reason": "主动撤销"
     }
   ]
 }

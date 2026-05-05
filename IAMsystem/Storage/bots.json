@@ -15,7 +15,7 @@
     {
       "bot_id": "bot_doc_001",
       "bot_name": "飞书文档助手Agent",
-      "agent_secret": "$2b$12$GkZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ9012",
+      "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
       "scope": {
         "doc": ["read", "write"],
         "indata": ["read"],
