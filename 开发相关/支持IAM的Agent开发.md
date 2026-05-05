@@ -23,7 +23,7 @@
 
 ## IAM系统的API文档
 
-详细请见 开发相关\IAM重新开发相关.md、IAMsystem\API文档
+详细请见 IAMsystem\API文档 目录下的各个api文档
 
 ## 其他
 

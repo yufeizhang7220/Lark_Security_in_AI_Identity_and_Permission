@@ -2,7 +2,7 @@ import json
 import os
 import bcrypt
 from typing import Dict, List, Any, Optional
-from config import USERS_FILE, BOTS_FILE
+from config import USERS_FILE, BOTS_FILE, BLACKLIST_PATH
 
 DEFAULT_USERS = {
     "_说明": "用户/访客身份存储表，存储所有普通用户和访客身份信息",
@@ -133,3 +133,28 @@ class Storage:
             return bcrypt.checkpw(plain_secret.encode('utf-8'), hashed_secret.encode('utf-8'))
         except Exception:
             return False
+
+    @staticmethod
+    def read_global_blacklist() -> Dict:
+        """读取全局黑名单文件"""
+        if not os.path.exists(BLACKLIST_PATH):
+            return {"agents": [], "ips": [], "users": []}
+        try:
+            with open(BLACKLIST_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {"agents": [], "ips": [], "users": []}
+    
+    @staticmethod
+    def is_in_blacklist(agent_id: str = "", ip: str = "") -> bool:
+        """检查AgentID/用户ID/IP是否在全局黑名单中"""
+        blacklist = Storage.read_global_blacklist()
+        # 检查Agent/用户黑名单
+        if agent_id:
+            if agent_id in blacklist.get("agents", []) or agent_id in blacklist.get("users", []):
+                return True
+        # 检查IP黑名单
+        if ip:
+            if ip in blacklist.get("ips", []):
+                return True
+        return False

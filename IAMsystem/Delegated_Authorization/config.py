@@ -17,6 +17,7 @@ MAX_TOKEN_TTL = 86400  # Token最长有效期24小时
 USERS_JSON_PATH = os.path.join(STORAGE_DIR, "users.json")
 BOTS_JSON_PATH = os.path.join(STORAGE_DIR, "bots.json")
 TOKEN_BLACKLIST_PATH = os.path.join(STORAGE_DIR, "token_blacklist.json")
+BLACKLIST_PATH = os.path.join(STORAGE_DIR, "blacklist.json") # 全局黑名单路径
 
 # 日志路径配置
 APPLY_TOKEN_LOG_DIR = os.path.join(LOGS_BASE_DIR, "Apply_Token")
@@ -29,7 +30,7 @@ SERVER_PORT = 9001  # 委托授权模块端口
 API_PREFIX = "/IAMsystem/auth"
 
 # 审计接口地址
-AUDIT_API_URL = "http://localhost:9000/IAMsystem/audit/audit"
+AUDIT_API_URL = "http://localhost:9000/IAMsystem/audit/logs"
 
 # 自动创建目录
 for dir_path in [STORAGE_DIR, APPLY_TOKEN_LOG_DIR, VERIFY_TOKEN_LOG_DIR, REVOKE_TOKEN_LOG_DIR]:

@@ -4,10 +4,10 @@
 
 ## 一、服务信息
 
-- **根路径**：`/IAMsystem`
-- **默认端口**：9000
-- **完整地址**：`http://localhost:9000/IAMsystem`
-- **API文档**：`http://localhost:9000/docs`
+- **根路径**：`/IAMsystem/identity`
+- **默认端口**：9002
+- **完整地址**：`http://localhost:9002/IAMsystem/identity`
+- **API文档**：`http://localhost:9002/docs`
 
 ## 二、认证与通用说明
 
@@ -20,20 +20,21 @@
 
 ### 3.1 用户/访客注册
 
-**地址**：`POST /identity/register/user`
+**地址**：`POST /register/user`
 
 **功能**：注册一个普通用户或访客
 
 **请求参数**：
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| Agent_name | string | 是 | 用户名称，全局唯一 |
-| subtype | string | 是 | 身份类型：`user` / `visitor` |
-| scope | object | 是 | 权限集合，JSON对象 |
-| ip | string | 否 | 注册IP地址，默认 `127.0.0.1` |
+| 字段          | 类型     | 必填 | 说明                      |
+| ----------- | ------ | -- | ----------------------- |
+| Agent\_name | string | 是  | 用户名称，全局唯一               |
+| subtype     | string | 是  | 身份类型：`user` / `visitor` |
+| scope       | object | 是  | 权限集合，JSON对象             |
+| ip          | string | 否  | 注册IP地址，默认 `127.0.0.1`   |
 
 **请求示例**：
+
 ```json
 {
     "Agent_name": "张三",
@@ -44,6 +45,7 @@
 ```
 
 **成功响应（HTTP 201）**：
+
 ```json
 {
     "code": 201,
@@ -60,6 +62,7 @@
 ```
 
 **失败响应（HTTP 400）**：
+
 ```json
 {
     "code": 400,
@@ -68,26 +71,27 @@
 }
 ```
 
----
+***
 
 ### 3.2 机器 Agent 注册
 
-**地址**：`POST /identity/register/bot`
+**地址**：`POST /register/bot`
 
 **功能**：注册一个机器 Agent
 
 **请求参数**：
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| Bot_name | string | 是 | Bot名称，全局唯一 |
-| Bot_id | string | 否 | 自定义BotID，系统自动生成 |
-| scope | object | 是 | Bot自身权限集合 |
-| sub_scope | object | 否 | 不同身份的权限映射表 |
-| api_endpoint | string | 否 | Bot服务地址 |
-| ip | string | 否 | 注册IP地址 |
+| 字段            | 类型     | 必填 | 说明              |
+| ------------- | ------ | -- | --------------- |
+| Bot\_name     | string | 是  | Bot名称，全局唯一      |
+| Bot\_id       | string | 否  | 自定义BotID，系统自动生成 |
+| scope         | object | 是  | Bot自身权限集合       |
+| sub\_scope    | object | 否  | 不同身份的权限映射表      |
+| api\_endpoint | string | 否  | Bot服务地址         |
+| ip            | string | 否  | 注册IP地址          |
 
 **请求示例**：
+
 ```json
 {
     "Bot_name": "外部检索Agent",
@@ -102,6 +106,7 @@
 ```
 
 **成功响应（HTTP 201）**：
+
 ```json
 {
     "code": 201,
@@ -118,6 +123,7 @@
 ```
 
 **失败响应（HTTP 400）**：
+
 ```json
 {
     "code": 400,
@@ -126,22 +132,23 @@
 }
 ```
 
----
+***
 
 ### 3.3 身份校验
 
-**地址**：`POST /identity/verify`
+**地址**：`POST /verify`
 
 **功能**：校验 AgentID 和 AgentSecret 的合法性
 
 **请求参数**：
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| agent_id | string | 是 | 系统生成的唯一ID |
-| agent_secret | string | 是 | 注册时返回的密钥 |
+| 字段            | 类型     | 必填 | 说明        |
+| ------------- | ------ | -- | --------- |
+| agent\_id     | string | 是  | 系统生成的唯一ID |
+| agent\_secret | string | 是  | 注册时返回的密钥  |
 
 **请求示例**：
+
 ```json
 {
     "agent_id": "user_1777000000_abc123",
@@ -150,6 +157,7 @@
 ```
 
 **成功响应（HTTP 200）**：
+
 ```json
 {
     "code": 200,
@@ -162,6 +170,7 @@
 ```
 
 **失败响应（HTTP 401）**：
+
 ```json
 {
     "code": 401,
@@ -170,13 +179,14 @@
 }
 ```
 
----
+***
 
 ### 3.4 健康检查
 
-**地址**：`GET /health`
+**地址**：`GET /health`（完整路径：`http://localhost:9002/IAMsystem/identity/health`）
 
 **响应**：
+
 ```json
 {
     "code": 200,
@@ -189,13 +199,14 @@
 
 ## 四、状态码说明
 
-| HTTP状态码 | code字段 | 含义 |
-|------------|----------|------|
-| 200 | 200 | 查询成功 |
-| 201 | 201 | 注册成功 |
-| 400 | 400 | 参数错误、缺少字段、ID已存在 |
-| 401 | 401 | 身份验证失败 |
-| 500 | 500 | 服务器内部错误（如文件写入失败） |
+| HTTP状态码 | code字段 | 含义               |
+| ------- | ------ | ---------------- |
+| 200     | 200    | 查询成功             |
+| 201     | 201    | 注册成功             |
+| 400     | 400    | 参数错误、缺少字段、ID已存在  |
+| 401     | 401    | 身份验证失败（密钥错误、凭证无效）           |
+| 403     | 403    | 操作被拦截（IP/Agent在黑名单、权限不足） |
+| 500     | 500    | 服务器内部错误（如文件写入失败） |
 
 ## 五、权限 scope 说明
 
@@ -211,6 +222,7 @@ scope 采用 `"资源类型:操作列表"` 的键值对结构：
 ```
 
 **预定义资源类型**：
+
 - `doc`：飞书文档操作权限
 - `indata`：企业内部数据访问权限
 - `online`：外部网络访问权限
@@ -225,6 +237,7 @@ Logs/Identity_Registration_Log/registration_YYYYMMDD.log
 ```
 
 **日志格式（JSON格式，一行一条）**：
+
 ```json
 {
     "log_id": "uuid",
@@ -243,27 +256,29 @@ Logs/Identity_Registration_Log/registration_YYYYMMDD.log
 ```
 
 **operation 类型**：
+
 - `register`：注册操作
 - `verify`：校验操作
 
 **status 类型**：
+
 - `success`：成功
 - `fail`：失败
 - `blocked`：拦截
 
----
+***
 
 ## 七、相关文件
 
-| 文件 | 说明 |
-|------|------|
-| `config.py` | 配置文件 |
-| `storage.py` | 存储操作模块 |
-| `audit_logger.py` | 审计日志模块 |
-| `app.py` | API接口实现 |
-| `main.py` | FastAPI入口 |
+| 文件                | 说明        |
+| ----------------- | --------- |
+| `config.py`       | 配置文件      |
+| `storage.py`      | 存储操作模块    |
+| `audit_logger.py` | 审计日志模块    |
+| `app.py`          | API接口实现   |
+| `main.py`         | FastAPI入口 |
 
----
+***
 
 **文档版本**：v2.0
 **最后更新**：2026-05-05

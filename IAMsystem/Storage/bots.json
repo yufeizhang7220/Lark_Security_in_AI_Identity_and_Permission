@@ -17,14 +17,35 @@
       "bot_name": "飞书文档助手Agent",
       "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
       "scope": {
-        "doc": ["read", "write"],
-        "indata": ["read"],
-        "online": ["web_search"],
-        "iam": ["apply_token"]
+        "doc": [
+          "read",
+          "write"
+        ],
+        "indata": [
+          "read"
+        ],
+        "online": [
+          "web_search"
+        ],
+        "iam": [
+          "apply_token"
+        ]
       },
       "sub_scope": {
-        "user": {"doc": ["read", "write"], "indata": ["read"]},
-        "visitor": {"doc": ["read"]}
+        "user": {
+          "doc": [
+            "read",
+            "write"
+          ],
+          "indata": [
+            "read"
+          ]
+        },
+        "visitor": {
+          "doc": [
+            "read"
+          ]
+        }
       },
       "ip": "127.0.0.1",
       "api_endpoint": "http://localhost:8000/api",
@@ -36,11 +57,23 @@
       "bot_name": "企业数据Agent",
       "agent_secret": "$2b$12$HlZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ3456",
       "scope": {
-        "indata": ["read_contact", "read_calendar", "read_bitable"],
-        "iam": ["verify_token"]
+        "indata": [
+          "read_contact",
+          "read_calendar",
+          "read_bitable"
+        ],
+        "iam": [
+          "verify_token"
+        ]
       },
       "sub_scope": {
-        "user": {"indata": ["read_contact", "read_calendar", "read_bitable"]},
+        "user": {
+          "indata": [
+            "read_contact",
+            "read_calendar",
+            "read_bitable"
+          ]
+        },
         "visitor": {}
       },
       "ip": "127.0.0.1",
@@ -53,16 +86,478 @@
       "bot_name": "外部检索Agent",
       "agent_secret": "$2b$12$ImZaYb4Rzq2p3G8X7y9Z0aBcDeFgHiJkLmNoPqRsTuVwXyZ7890",
       "scope": {
-        "online": ["web_search", "fetch_content"],
-        "iam": ["verify_token"]
+        "online": [
+          "web_search",
+          "fetch_content"
+        ],
+        "iam": [
+          "verify_token"
+        ]
       },
       "sub_scope": {
-        "user": {"online": ["web_search", "fetch_content"]},
-        "visitor": {"online": ["web_search"]}
+        "user": {
+          "online": [
+            "web_search",
+            "fetch_content"
+          ]
+        },
+        "visitor": {
+          "online": [
+            "web_search"
+          ]
+        }
       },
       "ip": "127.0.0.1",
       "api_endpoint": "http://localhost:8002/api",
       "registered_at": 1745800000,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777976941_2bff9433",
+      "bot_name": "测试Bot001",
+      "agent_secret": "$2b$12$fC09eZkDBM72DczrLQ7pfuFGr9.51En/W.r0QJYNYbjX.y0VTzGgy",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777976941,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977182_8495b2dc",
+      "bot_name": "测试Bot_7a82be",
+      "agent_secret": "$2b$12$119MlmPLtDvO3tvmjT9Ot.tYTGnQTlN7.ovHvpF0sN5DEEp.tpC1u",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977182,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977303_0cab6e99",
+      "bot_name": "测试Bot_1777977299_1180",
+      "agent_secret": "$2b$12$k8PwsZ1a2iaR9On7RWVkeONrIwGJDN769RBh7Vpinjd4PkdXC6NiW",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977304,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977329_2d94fb90",
+      "bot_name": "测试Bot_1777977325_1574",
+      "agent_secret": "$2b$12$f1nZgyJMo0Li5ZpI76hAA.uBFM32O1QathiLwl/wABesu8rVWmB2i",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977329,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977529_a68186a1",
+      "bot_name": "测试Bot_1777977525_753a",
+      "agent_secret": "$2b$12$42Q3ZXugsAy/s5G4EkovXu36DJizgBrtNpSEKUcylDzaj8MrFt6DO",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977529,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977555_8f5f20c7",
+      "bot_name": "测试Bot_1777977550_202d",
+      "agent_secret": "$2b$12$19c2U3G5p5ZKGSEvGUT5wOtcEMFBb8qpasiw7vUHen6o7oTNQtBta",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977555,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777977565_0f0ee58b",
+      "bot_name": "测试Bot_1777977561_841a",
+      "agent_secret": "$2b$12$c8ufJ5Bq8tP3C/saLGPQ9eV8LGYbWR0fVrSouEPpjgYjM58s4vmQK",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777977566,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978164_45798569",
+      "bot_name": "测试Bot_1777978160_8992",
+      "agent_secret": "$2b$12$8lxYzDBb91zaAVCg3HI8tOGFeMHIYyIQeR1BR63pcAqRYzPIXccpS",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978164,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978190_f942e43c",
+      "bot_name": "测试Bot_1777978186_872e",
+      "agent_secret": "$2b$12$oEDw1JKMuvh42jvA8ulSHOJOxKxIiJRnF5SkGgfWQpHkqUJzKJaiu",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978190,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978201_64d74d23",
+      "bot_name": "测试Bot_1777978197_6137",
+      "agent_secret": "$2b$12$oZPRExQYKHvmDTClFroHZeHLdOimZqP1J60UmdAlAw7uzGgSz71m2",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978201,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978358_859ae666",
+      "bot_name": "测试Bot_1777978354_6439",
+      "agent_secret": "$2b$12$X0BhJWWhUyCN5wweo68JReTlphXCcfX0ExZ1uxrXpZc2FFf0d1FeO",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978358,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978384_a9359d92",
+      "bot_name": "测试Bot_1777978380_4d29",
+      "agent_secret": "$2b$12$dljcn.1v5dAFEw0wrhz4L.pNyLOKy26fl8j5bXSWhKCJrqJ1E4y0O",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978384,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978394_d4905b43",
+      "bot_name": "测试Bot_1777978390_8a31",
+      "agent_secret": "$2b$12$wmHbCnJUGFWfQYtlpdRXAOfdjdXZuqtbgnSJlQQDQRnjhZCz6Vj7G",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978395,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1777978716_8bf4ceb1",
+      "bot_name": "测试Bot_临时",
+      "agent_secret": "$2b$12$5yVTkw.hR34MHGVSSAd0bOyGdfHKtuJqiGDp9Wv1CnR6QGetQ3i2C",
+      "scope": {
+        "doc": [
+          "read",
+          "write",
+          "share"
+        ],
+        "file": [
+          "upload"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "doc": [
+            "read",
+            "write",
+            "share"
+          ],
+          "file": [
+            "upload"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8000/test/bot",
+      "registered_at": 1777978716,
       "status": "active"
     }
   ]

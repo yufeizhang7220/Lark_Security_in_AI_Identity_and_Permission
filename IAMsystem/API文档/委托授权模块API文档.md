@@ -207,6 +207,7 @@ curl -X POST "http://localhost:9001/IAMsystem/auth/verify-token" \
     "valid": true,
     "revoked_at": 1777862659,
     "revoked_by": "user_001",
+    "jti": "40f99f914f534afa8b61383388875399",
     "revoke_reason": "主动撤销"
   }
 }
@@ -216,6 +217,7 @@ curl -X POST "http://localhost:9001/IAMsystem/auth/verify-token" \
 | `valid` | boolean | 撤销是否成功 |
 | `revoked_at` | int | 撤销时间戳 |
 | `revoked_by` | string | 执行撤销操作的AgentID |
+| `jti` | string | 被撤销的Token唯一标识 |
 | `revoke_reason` | string | 撤销原因 |
 
 #### curl调用示例

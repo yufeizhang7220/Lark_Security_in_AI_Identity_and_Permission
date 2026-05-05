@@ -121,6 +121,34 @@
       "revoked_at": 1777864555,
       "revoked_by": "visitor_001",
       "revoke_reason": "主动撤销"
+    },
+    {
+      "jti": "4037df62076143d28816da414906769b",
+      "expire_at": 1777980946,
+      "revoked_at": 1777977351,
+      "revoked_by": "user_1777977342_acb6d73e",
+      "revoke_reason": "测试撤销"
+    },
+    {
+      "jti": "f81dea2298864372bb5eebf0fed8ad49",
+      "expire_at": 1777981170,
+      "revoked_at": 1777977574,
+      "revoked_by": "user_1777977561_6ea0f86e",
+      "revoke_reason": "测试"
+    },
+    {
+      "jti": "5015bc5797184de48f4453a5d6e89550",
+      "expire_at": 1777981805,
+      "revoked_at": 1777978209,
+      "revoked_by": "user_1777978197_e27f991f",
+      "revoke_reason": "测试"
+    },
+    {
+      "jti": "87f9650386e549a09d7a8a1ce0549652",
+      "expire_at": 1777981999,
+      "revoked_at": 1777978403,
+      "revoked_by": "user_1777978390_748d00bd",
+      "revoke_reason": "测试"
     }
   ]
 }

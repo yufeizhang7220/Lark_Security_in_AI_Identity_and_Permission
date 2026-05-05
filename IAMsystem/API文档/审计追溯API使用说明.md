@@ -6,6 +6,7 @@
 
 ## 二、统一响应格式
 
+除`/logs`审计校验接口和`/health`健康检查接口外，其他接口均遵循以下响应格式：
 ```json
 {
   "code": 200,
@@ -40,8 +41,8 @@
 | 参数名 | 类型 | 必填 | 说明 |
 | :--- | :--- | :--- | :--- |
 | agent_id | string | 是 | 操作主体 AgentID |
-| start_time | int | 是 | 查询开始时间戳（毫秒） |
-| end_time | int | 是 | 查询结束时间戳（毫秒） |
+| start_time | int | 是 | 查询开始时间戳（毫秒级） |
+| end_time | int | 是 | 查询结束时间戳（毫秒级） |
 | operation | string | 是 | 操作类型（register/authorize/verify） |
 | detail | object | 是 | 操作详情 |
 
@@ -262,8 +263,8 @@
 
 | 参数名 | 类型 | 必填 | 说明 |
 | :--- | :--- | :--- | :--- |
-| start_time | int | 是 | 查询开始时间戳（毫秒） |
-| end_time | int | 是 | 查询结束时间戳（毫秒） |
+| start_time | int | 是 | 查询开始时间戳（毫秒级） |
+| end_time | int | 是 | 查询结束时间戳（毫秒级） |
 
 **请求示例**：
 

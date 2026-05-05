@@ -10,7 +10,7 @@ from config import SERVER_HOST, SERVER_PORT, API_PREFIX
 from utils import (
     get_agent_by_id, verify_agent_secret, calculate_scope_intersection,
     generate_jwt, decode_jwt, is_token_in_blacklist, add_token_to_blacklist,
-    check_scope_sufficient, call_audit_api, write_audit_log
+    check_scope_sufficient, call_audit_api, write_audit_log, is_in_blacklist
 )
 
 app = FastAPI(title="IAM委托授权服务", description="Agent身份与权限系统-委托授权模块")
@@ -74,6 +74,11 @@ async def apply_token(request: Request, req: ApplyTokenRequest):
     }
     
     try:
+        # 0. 全局黑名单校验
+        if is_in_blacklist(agent_id=req.agent_id, ip=client_ip):
+            log_data["fail_reason"] = "该Agent/IP已被拉黑，禁止操作"
+            write_audit_log("apply_token", log_data)
+            return error_response(403, "该Agent/IP已被拉黑，禁止操作")
         # 1. 验证Agent身份是否存在且状态正常
         agent = get_agent_by_id(req.agent_id)
         if not agent:
@@ -168,6 +173,11 @@ async def verify_token(request: Request, req: VerifyTokenRequest):
     }
     
     try:
+        # 0. 全局黑名单校验
+        if is_in_blacklist(agent_id=req.bot_id, ip=client_ip):
+            log_data["fail_reason"] = "该Agent/IP已被拉黑，禁止操作"
+            write_audit_log("verify_token", log_data)
+            return error_response(403, "该Agent/IP已被拉黑，禁止操作")
         # 1. 校验调用方Bot身份和密钥
         bot_agent = get_agent_by_id(req.bot_id)
         if not bot_agent or bot_agent.get("type") != "bot":
@@ -265,6 +275,11 @@ async def revoke_token(request: Request, req: RevokeTokenRequest):
     }
     
     try:
+        # 0. 全局黑名单校验
+        if is_in_blacklist(agent_id=req.agent_id, ip=client_ip):
+            log_data["fail_reason"] = "该Agent/IP已被拉黑，禁止操作"
+            write_audit_log("revoke_token", log_data)
+            return error_response(403, "该Agent/IP已被拉黑，禁止操作")
         # 1. 验证Agent身份和密钥
         agent = get_agent_by_id(req.agent_id)
         if not agent:
