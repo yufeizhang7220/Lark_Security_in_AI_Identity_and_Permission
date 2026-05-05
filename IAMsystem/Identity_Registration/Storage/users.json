@@ -1,0 +1,14 @@
+{
+  "_说明": "用户/访客身份存储表，存储所有普通用户和访客身份信息",
+  "fields_说明": {
+    "agent_id": "系统生成的唯一用户ID，全局唯一",
+    "agent_name": "用户自定义名称",
+    "subtype": "身份类型：user（普通用户）/visitor（访客）",
+    "agent_secret": "bcrypt加密后的用户密钥，不可逆",
+    "scope": "用户的静态权限集合，JSON对象",
+    "ip": "注册时绑定的IP地址",
+    "registered_at": "注册时间戳（秒）",
+    "status": "状态：active（正常）/disabled（禁用）"
+  },
+  "data": []
+}

@@ -1,0 +1,15 @@
+{
+  "_说明": "机器Agent身份存储表，存储所有注册的Bot身份信息",
+  "fields_说明": {
+    "bot_id": "系统生成的唯一BotID，全局唯一",
+    "bot_name": "Bot的名称",
+    "agent_secret": "bcrypt加密后的Bot密钥，不可逆",
+    "scope": "Bot自身的静态权限集合，JSON对象",
+    "sub_scope": "不同身份调用该Bot时的权限映射表，key是身份类型，value是对应的权限范围",
+    "ip": "注册时绑定的IP地址",
+    "api_endpoint": "Bot提供服务的API地址",
+    "registered_at": "注册时间戳（秒）",
+    "status": "状态：active（正常）/disabled（禁用）/pending（待审核）"
+  },
+  "data": []
+}

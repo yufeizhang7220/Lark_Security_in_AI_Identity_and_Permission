@@ -1,63 +1,135 @@
-"""
-存储操作模块
-负责读取和写入 USERS_table.json 和 BOTS_table.json
-"""
-
 import json
 import os
-from typing import Dict, Any
-from config import USERS_TABLE_PATH, BOTS_TABLE_PATH
+import bcrypt
+from typing import Dict, List, Any, Optional
+from config import USERS_FILE, BOTS_FILE
 
+DEFAULT_USERS = {
+    "_说明": "用户/访客身份存储表，存储所有普通用户和访客身份信息",
+    "fields_说明": {
+        "agent_id": "系统生成的唯一用户ID，全局唯一",
+        "agent_name": "用户自定义名称",
+        "subtype": "身份类型：user（普通用户）/visitor（访客）",
+        "agent_secret": "bcrypt加密后的用户密钥，不可逆",
+        "scope": "用户的静态权限集合，JSON对象",
+        "ip": "注册时绑定的IP地址",
+        "registered_at": "注册时间戳（秒）",
+        "status": "状态：active（正常）/disabled（禁用）"
+    },
+    "data": []
+}
+
+DEFAULT_BOTS = {
+    "_说明": "机器Agent身份存储表，存储所有注册的Bot身份信息",
+    "fields_说明": {
+        "bot_id": "系统生成的唯一BotID，全局唯一",
+        "bot_name": "Bot的名称",
+        "agent_secret": "bcrypt加密后的Bot密钥，不可逆",
+        "scope": "Bot自身的静态权限集合，JSON对象",
+        "sub_scope": "不同身份调用该Bot时的权限映射表，key是身份类型，value是对应的权限范围",
+        "ip": "注册时绑定的IP地址",
+        "api_endpoint": "Bot提供服务的API地址",
+        "registered_at": "注册时间戳（秒）",
+        "status": "状态：active（正常）/disabled（禁用）/pending（待审核）"
+    },
+    "data": []
+}
 
 class Storage:
-    """存储管理类"""
-
     @staticmethod
-    def _ensure_file_exists(file_path: str):
-        """确保文件存在"""
+    def _ensure_file_exists(file_path: str, default_data: Dict) -> None:
         if not os.path.exists(file_path):
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump({}, f, ensure_ascii=False, indent=4)
+                json.dump(default_data, f, ensure_ascii=False, indent=2)
 
     @staticmethod
-    def load_users() -> Dict[str, Any]:
-        """加载用户表"""
-        Storage._ensure_file_exists(USERS_TABLE_PATH)
+    def load_users() -> Dict:
+        Storage._ensure_file_exists(USERS_FILE, DEFAULT_USERS)
         try:
-            with open(USERS_TABLE_PATH, 'r', encoding='utf-8') as f:
+            with open(USERS_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            return {}
+            return DEFAULT_USERS.copy()
 
     @staticmethod
-    def save_users(users: Dict[str, Any]) -> bool:
-        """保存用户表"""
+    def save_users(users: Dict) -> bool:
         try:
-            Storage._ensure_file_exists(USERS_TABLE_PATH)
-            with open(USERS_TABLE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(users, f, ensure_ascii=False, indent=4)
+            with open(USERS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(users, f, ensure_ascii=False, indent=2)
             return True
         except Exception:
             return False
 
     @staticmethod
-    def load_bots() -> Dict[str, Any]:
-        """加载机器表"""
-        Storage._ensure_file_exists(BOTS_TABLE_PATH)
+    def load_bots() -> Dict:
+        Storage._ensure_file_exists(BOTS_FILE, DEFAULT_BOTS)
         try:
-            with open(BOTS_TABLE_PATH, 'r', encoding='utf-8') as f:
+            with open(BOTS_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            return {}
+            return DEFAULT_BOTS.copy()
 
     @staticmethod
-    def save_bots(bots: Dict[str, Any]) -> bool:
-        """保存机器表"""
+    def save_bots(bots: Dict) -> bool:
         try:
-            Storage._ensure_file_exists(BOTS_TABLE_PATH)
-            with open(BOTS_TABLE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(bots, f, ensure_ascii=False, indent=4)
+            with open(BOTS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(bots, f, ensure_ascii=False, indent=2)
             return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def find_user_by_name(agent_name: str) -> Optional[Dict]:
+        users = Storage.load_users()
+        for user in users.get("data", []):
+            if user.get("agent_name") == agent_name:
+                return user
+        return None
+
+    @staticmethod
+    def find_user_by_id(agent_id: str) -> Optional[Dict]:
+        users = Storage.load_users()
+        for user in users.get("data", []):
+            if user.get("agent_id") == agent_id:
+                return user
+        return None
+
+    @staticmethod
+    def find_bot_by_name(bot_name: str) -> Optional[Dict]:
+        bots = Storage.load_bots()
+        for bot in bots.get("data", []):
+            if bot.get("bot_name") == bot_name:
+                return bot
+        return None
+
+    @staticmethod
+    def find_bot_by_id(bot_id: str) -> Optional[Dict]:
+        bots = Storage.load_bots()
+        for bot in bots.get("data", []):
+            if bot.get("bot_id") == bot_id:
+                return bot
+        return None
+
+    @staticmethod
+    def add_user(user_data: Dict) -> bool:
+        users = Storage.load_users()
+        users["data"].append(user_data)
+        return Storage.save_users(users)
+
+    @staticmethod
+    def add_bot(bot_data: Dict) -> bool:
+        bots = Storage.load_bots()
+        bots["data"].append(bot_data)
+        return Storage.save_bots(bots)
+
+    @staticmethod
+    def hash_secret(secret: str) -> str:
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(secret.encode('utf-8'), salt).decode('utf-8')
+
+    @staticmethod
+    def verify_secret(plain_secret: str, hashed_secret: str) -> bool:
+        try:
+            return bcrypt.checkpw(plain_secret.encode('utf-8'), hashed_secret.encode('utf-8'))
         except Exception:
             return False
