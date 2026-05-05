@@ -1,300 +1,247 @@
-"""
-身份注册 API 实现
-"""
-
-import secrets
-import time
-import os
-import logging
-from typing import Dict, Any, List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Dict, Optional, Any
+import time
+import uuid
+import secrets
 from storage import Storage
+from audit_logger import AuditLogger
 
 router = APIRouter()
 
-LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Logs", "Identity_Registration_Log")
-LOG_FILE = os.path.join(LOG_DIR, "registration.log")
-
-os.makedirs(LOG_DIR, exist_ok=True)
-
-file_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(logging.Formatter('%(message)s'))
-
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-stream_handler.setFormatter(logging.Formatter('%(message)s'))
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
-
-
-def generate_secret(length: int = 32) -> str:
-    """生成随机密钥"""
-    return secrets.token_hex(length // 2)
-
-
-def get_current_timestamp() -> int:
-    """获取当前时间戳（秒）"""
-    return int(time.time())
-
-
-def get_readable_time() -> str:
-    """获取可读时间格式"""
-    from datetime import datetime
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-
-def log_registration(who: str, ip: str, identity: str, scope: Dict, extra_info: str, result_code: int, message: str):
-    """
-    记录注册日志，格式符合团队要求
-    [时间] [谁] 在 [ip] 注册 [身份] 权限 [权限范围] [其他信息] 结果 [status] 原因 [message]
-    """
-    scope_str = str(scope).replace("'", '"')
-    if extra_info:
-        log_msg = f"[{get_readable_time()}] [{who}] 在 [{ip}] 注册 [{identity}] 权限 {scope_str} {extra_info} 结果 {result_code} 原因 {message}"
-    else:
-        log_msg = f"[{get_readable_time()}] [{who}] 在 [{ip}] 注册 [{identity}] 权限 {scope_str} 结果 {result_code} 原因 {message}"
-
-    if result_code == 201:
-        logger.info(log_msg)
-    else:
-        logger.error(log_msg)
-
-
 class UserRegisterRequest(BaseModel):
-    AgentID: str
-    Subtype: str
-    scope: Dict[str, List[str]]
-    ip: str
-
+    Agent_name: str
+    subtype: str
+    scope: Dict[str, Any]
+    ip: Optional[str] = "127.0.0.1"
 
 class BotRegisterRequest(BaseModel):
-    AgentID: str
-    Subtype: str
-    scope: Dict[str, List[str]]
-    bot_description: str
-    apis: List[Dict[str, Any]]
-    ip: str
+    Bot_name: str
+    Bot_id: Optional[str] = None
+    scope: Dict[str, Any]
+    ip: Optional[str] = "127.0.0.1"
+    sub_scope: Optional[Dict[str, Dict[str, Any]]] = None
+    api_endpoint: Optional[str] = ""
 
+class VerifyRequest(BaseModel):
+    agent_id: str
+    agent_secret: str
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
-def register_user(request: UserRegisterRequest):
-    """
-    用户注册
-    写入 USERS_table.json
-    """
-    users = Storage.load_users()
+def generate_agent_secret() -> str:
+    return secrets.token_hex(16)
 
-    if request.AgentID in users:
-        log_registration(
-            who=request.AgentID,
-            ip=request.ip,
-            identity=request.Subtype,
-            scope=request.scope,
-            extra_info="",
-            result_code=400,
-            message="AgentID已存在"
-        )
-        return {
-            "code": 400,
-            "message": "AgentID已存在",
-            "data": None
+def generate_agent_id(prefix: str = "user") -> str:
+    timestamp = int(time.time())
+    random_str = secrets.token_hex(4)
+    return f"{prefix}_{timestamp}_{random_str}"
+
+@router.post("/identity/register/user", status_code=201)
+async def register_user(request: UserRegisterRequest):
+    if Storage.find_user_by_name(request.Agent_name):
+        audit_detail = {
+            "subtype": request.subtype,
+            "scope": request.scope,
+            "agent_secret": "****"
         }
+        AuditLogger.log_register(
+            agent_id="",
+            ip=request.ip,
+            status="fail",
+            detail=audit_detail,
+            agent_name=request.Agent_name
+        )
+        raise HTTPException(status_code=400, detail="Agent名称已存在")
 
-    agent_secret = generate_secret()
-    registered_at = get_current_timestamp()
+    plain_secret = generate_agent_secret()
+    hashed_secret = Storage.hash_secret(plain_secret)
+    agent_id = generate_agent_id("user")
 
     user_data = {
-        "AgentID": request.AgentID,
-        "Subtype": request.Subtype,
+        "agent_id": agent_id,
+        "agent_name": request.Agent_name,
+        "subtype": request.subtype,
+        "agent_secret": hashed_secret,
         "scope": request.scope,
-        "AgentSecret": agent_secret,
-        "registered_at": registered_at,
-        "ip": request.ip
+        "ip": request.ip,
+        "registered_at": int(time.time()),
+        "status": "active"
     }
 
-    users[request.AgentID] = user_data
-
-    if not Storage.save_users(users):
-        log_registration(
-            who=request.AgentID,
-            ip=request.ip,
-            identity=request.Subtype,
-            scope=request.scope,
-            extra_info="",
-            result_code=500,
-            message="文件写入失败"
-        )
-        return {
-            "code": 500,
-            "message": "服务器内部错误",
-            "data": None
+    if not Storage.add_user(user_data):
+        audit_detail = {
+            "subtype": request.subtype,
+            "scope": request.scope,
+            "agent_secret": "****"
         }
+        AuditLogger.log_register(
+            agent_id=agent_id,
+            ip=request.ip,
+            status="fail",
+            detail=audit_detail,
+            agent_name=request.Agent_name
+        )
+        raise HTTPException(status_code=500, detail="服务器内部错误")
 
-    log_registration(
-        who=request.AgentID,
+    audit_detail = {
+        "subtype": request.subtype,
+        "scope": request.scope,
+        "agent_secret": "****"
+    }
+    AuditLogger.log_register(
+        agent_id=agent_id,
         ip=request.ip,
-        identity=request.Subtype,
-        scope=request.scope,
-        extra_info="",
-        result_code=201,
-        message="注册成功"
+        status="success",
+        detail=audit_detail,
+        agent_name=request.Agent_name
     )
 
     return {
         "code": 201,
-        "message": "注册成功",
-        "data": user_data
+        "message": "success",
+        "data": {
+            "Agent_name": request.Agent_name,
+            "subtype": request.subtype,
+            "scope": request.scope,
+            "agent_id": agent_id,
+            "agent_secret": plain_secret,
+            "registered_at": int(time.time())
+        }
     }
 
-
-@router.post("/register/bot", status_code=status.HTTP_201_CREATED)
-def register_bot(request: BotRegisterRequest):
-    """
-    机器注册（Agent注册）
-    写入 USERS_table.json 和 BOTS_table.json
-    """
-    users = Storage.load_users()
-
-    if request.AgentID in users:
-        log_registration(
-            who=request.AgentID,
-            ip=request.ip,
-            identity=request.Subtype,
-            scope=request.scope,
-            extra_info=f"APIs数量:{len(request.apis)}",
-            result_code=400,
-            message="AgentID已存在"
-        )
-        return {
-            "code": 400,
-            "message": "AgentID已存在",
-            "data": None
+@router.post("/identity/register/bot", status_code=201)
+async def register_bot(request: BotRegisterRequest):
+    if Storage.find_bot_by_name(request.Bot_name):
+        audit_detail = {
+            "subtype": "bot",
+            "scope": request.scope,
+            "agent_secret": "****"
         }
-
-    agent_secret = generate_secret()
-    registered_at = get_current_timestamp()
-
-    user_data = {
-        "AgentID": request.AgentID,
-        "Subtype": request.Subtype,
-        "scope": request.scope,
-        "AgentSecret": agent_secret,
-        "registered_at": registered_at,
-        "ip": request.ip
-    }
-
-    users[request.AgentID] = user_data
-    if not Storage.save_users(users):
-        log_registration(
-            who=request.AgentID,
+        AuditLogger.log_register(
+            agent_id=request.Bot_id or "",
             ip=request.ip,
-            identity=request.Subtype,
-            scope=request.scope,
-            extra_info=f"APIs数量:{len(request.apis)}",
-            result_code=500,
-            message="USERS_table写入失败"
+            status="fail",
+            detail=audit_detail,
+            agent_name=request.Bot_name
         )
-        return {
-            "code": 500,
-            "message": "服务器内部错误",
-            "data": None
-        }
+        raise HTTPException(status_code=400, detail="Bot名称已存在")
 
-    bots = Storage.load_bots()
+    bot_id = request.Bot_id or generate_agent_id("bot")
+    plain_secret = generate_agent_secret()
+    hashed_secret = Storage.hash_secret(plain_secret)
 
     bot_data = {
-        "bot_name": request.AgentID,
-        "bot_description": request.bot_description,
-        "API_adderess": []
+        "bot_id": bot_id,
+        "bot_name": request.Bot_name,
+        "agent_secret": hashed_secret,
+        "scope": request.scope,
+        "sub_scope": request.sub_scope or {"user": request.scope, "visitor": {}},
+        "ip": request.ip,
+        "api_endpoint": request.api_endpoint,
+        "registered_at": int(time.time()),
+        "status": "active"
     }
 
-    for api in request.apis:
-        api_entry = {
-            "api_id": api.get("api_id"),
-            "api": api.get("api"),
-            "description": api.get("description", ""),
-            "method": api.get("method"),
-            "scope": api.get("scope", {}),
-            "required_json": api.get("required_json", {}),
-            "output_json": api.get("output_json", {})
+    if not Storage.add_bot(bot_data):
+        audit_detail = {
+            "subtype": "bot",
+            "scope": request.scope,
+            "agent_secret": "****"
         }
-        bot_data["API_adderess"].append(api_entry)
-
-    bots[request.AgentID] = bot_data
-
-    if not Storage.save_bots(bots):
-        log_registration(
-            who=request.AgentID,
+        AuditLogger.log_register(
+            agent_id=bot_id,
             ip=request.ip,
-            identity=request.Subtype,
-            scope=request.scope,
-            extra_info=f"APIs数量:{len(request.apis)}",
-            result_code=500,
-            message="BOTS_table写入失败"
+            status="fail",
+            detail=audit_detail,
+            agent_name=request.Bot_name
         )
-        return {
-            "code": 500,
-            "message": "服务器内部错误",
-            "data": None
-        }
+        raise HTTPException(status_code=500, detail="服务器内部错误")
 
-    log_registration(
-        who=request.AgentID,
+    audit_detail = {
+        "subtype": "bot",
+        "scope": request.scope,
+        "agent_secret": "****"
+    }
+    AuditLogger.log_register(
+        agent_id=bot_id,
         ip=request.ip,
-        identity=request.Subtype,
-        scope=request.scope,
-        extra_info=f"描述:{request.bot_description}, APIs数量:{len(request.apis)}",
-        result_code=201,
-        message="机器注册成功"
+        status="success",
+        detail=audit_detail,
+        agent_name=request.Bot_name
     )
 
     return {
         "code": 201,
-        "message": "机器注册成功",
-        "data": user_data
+        "message": "success",
+        "data": {
+            "Agent_name": request.Bot_name,
+            "subtype": "bot",
+            "scope": request.scope,
+            "agent_id": bot_id,
+            "agent_secret": plain_secret,
+            "registered_at": int(time.time())
+        }
     }
 
-
-@router.get("/bot/{AgentID}/api/{api_id}")
-def get_bot_api(AgentID: str, api_id: str):
-    """
-    查询机器 API 信息（通过 api_id）
-    """
-    bots = Storage.load_bots()
-
-    if AgentID not in bots:
-        return {
-            "code": 404,
-            "message": "Agent 或 api_id 不存在",
-            "data": None
+@router.post("/identity/verify")
+async def verify_identity(request: VerifyRequest):
+    user = Storage.find_user_by_id(request.agent_id)
+    if user:
+        is_valid = Storage.verify_secret(request.agent_secret, user["agent_secret"])
+        audit_detail = {
+            "valid": is_valid,
+            "scope": user.get("scope", {}) if is_valid else {}
         }
-
-    bot = bots[AgentID]
-    apis = bot.get("API_adderess", [])
-
-    for api in apis:
-        if api.get("api_id") == api_id:
+        AuditLogger.log_verify(
+            agent_id=request.agent_id,
+            ip="",
+            status="success" if is_valid else "fail",
+            detail=audit_detail
+        )
+        if is_valid:
             return {
                 "code": 200,
-                "data": api
+                "message": "success",
+                "data": {
+                    "valid": True,
+                    "scope": user["scope"]
+                }
             }
 
-    return {
-        "code": 404,
-        "message": "Agent 或 api_id 不存在",
-        "data": None
-    }
+    bot = Storage.find_bot_by_id(request.agent_id)
+    if bot:
+        is_valid = Storage.verify_secret(request.agent_secret, bot["agent_secret"])
+        audit_detail = {
+            "valid": is_valid,
+            "scope": bot.get("scope", {}) if is_valid else {}
+        }
+        AuditLogger.log_verify(
+            agent_id=request.agent_id,
+            ip="",
+            status="success" if is_valid else "fail",
+            detail=audit_detail
+        )
+        if is_valid:
+            return {
+                "code": 200,
+                "message": "success",
+                "data": {
+                    "valid": True,
+                    "scope": bot["scope"]
+                }
+            }
 
+    audit_detail = {
+        "valid": False,
+        "fail_reason": "Agent不存在"
+    }
+    AuditLogger.log_verify(
+        agent_id=request.agent_id,
+        ip="",
+        status="fail",
+        detail=audit_detail
+    )
+    raise HTTPException(status_code=401, detail="身份验证失败")
 
 @router.get("/health")
-def health_check():
-    """健康检查"""
-    return {
-        "status": "healthy",
-        "service": "Identity-Registration-API"
-    }
+async def health_check():
+    return {"code": 200, "message": "success", "data": {"status": "healthy"}}
