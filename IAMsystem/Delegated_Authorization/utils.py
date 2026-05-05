@@ -9,10 +9,10 @@ import jwt
 import bcrypt
 import requests
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from config import (
     JWT_SECRET, JWT_ALGORITHM, MAX_TOKEN_TTL,
-    USERS_JSON_PATH, BOTS_JSON_PATH, TOKEN_BLACKLIST_PATH,
+    USERS_JSON_PATH, BOTS_JSON_PATH, TOKEN_BLACKLIST_PATH, BLACKLIST_PATH,
     APPLY_TOKEN_LOG_DIR, VERIFY_TOKEN_LOG_DIR, REVOKE_TOKEN_LOG_DIR,
     AUDIT_API_URL
 )
@@ -28,6 +28,29 @@ def read_json_file(file_path: str) -> Dict:
             return json.load(f)
     except Exception:
         return {"data": []}
+# 读取全局黑名单
+def read_global_blacklist() -> Dict:
+    """读取全局黑名单文件"""
+    if not os.path.exists(BLACKLIST_PATH):
+        return {"agents": [], "ips": [], "users": []}
+    try:
+        with open(BLACKLIST_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"agents": [], "ips": [], "users": []}
+# 检查是否在全局黑名单中
+def is_in_blacklist(agent_id: str = "", ip: str = "") -> bool:
+    """检查AgentID/用户ID/IP是否在全局黑名单中"""
+    blacklist = read_global_blacklist()
+    # 检查Agent/用户黑名单
+    if agent_id:
+        if agent_id in blacklist.get("agents", []) or agent_id in blacklist.get("users", []):
+            return True
+    # 检查IP黑名单
+    if ip:
+        if ip in blacklist.get("ips", []):
+            return True
+    return False
 
 # 写入JSON文件
 def write_json_file(file_path: str, data: Dict) -> bool:
@@ -205,10 +228,44 @@ def write_audit_log(log_type: str, log_data: Dict):
     
     if log_type == "apply_token":
         log_dir = APPLY_TOKEN_LOG_DIR
+        # 上报到审计模块
+        audit_data = {
+            "agent_id": log_data.get("agent_id", ""),
+            "ip": log_data.get("ip", ""),
+            "token_id": log_data.get("jti", ""),
+            "applied_scope": log_data.get("applied_scope", {}),
+            "granted_scope": log_data.get("granted_scope", {}),
+            "expire_at": log_data.get("expire_at", 0),
+            "status": log_data.get("status", "success"),
+            "fail_reason": log_data.get("fail_reason", "")
+        }
+        report_audit_log(AUDIT_AUTHORIZATION_URL, audit_data)
     elif log_type == "verify_token":
         log_dir = VERIFY_TOKEN_LOG_DIR
+        # 上报到审计模块
+        audit_data = {
+            "agent_id": log_data.get("agent_id", ""),
+            "ip": log_data.get("ip", ""),
+            "token_id": log_data.get("jti", ""),
+            "required_scope": log_data.get("required_scope", {}),
+            "valid": log_data.get("valid", False),
+            "fail_reason": log_data.get("fail_reason", "")
+        }
+        report_audit_log(AUDIT_VERIFICATION_URL, audit_data)
     elif log_type == "revoke_token":
         log_dir = REVOKE_TOKEN_LOG_DIR
+        # 上报到审计模块
+        audit_data = {
+            "agent_id": log_data.get("agent_id", ""),
+            "ip": log_data.get("ip", ""),
+            "token_id": log_data.get("jti", ""),
+            "applied_scope": {},
+            "granted_scope": {},
+            "expire_at": 0,
+            "status": log_data.get("status", "success"),
+            "fail_reason": log_data.get("fail_reason", "")
+        }
+        report_audit_log(AUDIT_AUTHORIZATION_URL, audit_data)
     else:
         return
     
@@ -226,14 +283,36 @@ def write_audit_log(log_type: str, log_data: Dict):
         pass
 
 # ------------------------------ 审计工具 ------------------------------
+# 审计模块上报接口地址
+AUDIT_RECORD_URL = "http://localhost:9000/IAMsystem/audit/record"
+AUDIT_AUTHORIZATION_URL = "http://localhost:9000/IAMsystem/audit/record/authorization"
+AUDIT_VERIFICATION_URL = "http://localhost:9000/IAMsystem/audit/record/verification"
+
+def report_audit_log(url: str, data: Dict[str, Any]) -> bool:
+    """上报日志到审计模块"""
+    try:
+        requests.post(url, json=data, timeout=2)
+        return True
+    except Exception:
+        return False  # 上报失败不影响业务
+
 # 调用审计接口检查操作是否合法
 def call_audit_api(audit_data: Dict) -> bool:
     """调用审计接口检查操作是否合法"""
     try:
-        response = requests.post(AUDIT_API_URL, json=audit_data, timeout=3)
+        now = int(time.time())
+        # 补全审计接口要求的必填参数
+        request_data = {
+            "agent_id": audit_data.get("agent_id", ""),
+            "start_time": now - 3600,  # 检查最近1小时的操作
+            "end_time": now,
+            "operation": audit_data.get("operation", ""),
+            "detail": audit_data.get("detail", {})
+        }
+        response = requests.post(AUDIT_API_URL, json=request_data, timeout=3)
         if response.status_code == 200:
             result = response.json()
-            return result.get("data", {}).get("valid", False)
+            return result.get("valid", False)
         return True  # 审计接口不可用时默认放行，保证可用性
     except Exception:
         return True  # 审计接口异常时默认放行
