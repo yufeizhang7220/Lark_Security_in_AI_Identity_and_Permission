@@ -1,0 +1,154 @@
+{
+  "_说明": "AccessToken黑名单存储表，仅存储被主动撤销的Token，JWT本身是自包含的，不需要存储所有有效Token",
+  "_设计说明": "JWT Token本身包含所有需要的信息（身份、权限、过期时间），有效Token不需要存储在服务端。只有当Token被主动撤销时，才会将其jti加入黑名单，校验时优先检查该表。Token过期后可以自动从黑名单中清理。",
+  "fields_说明": {
+    "jti": "Token的唯一标识，对应JWT中的jti字段",
+    "expire_at": "Token的过期时间戳（秒），超过这个时间可以自动删除该条目",
+    "revoked_at": "撤销时间戳（秒），如果为null表示还未撤销",
+    "revoked_by": "撤销操作的主体AgentID/system",
+    "revoke_reason": "撤销原因：主动撤销/权限变更/安全风险/还未撤销/到期撤销"
+  },
+  "data": [
+    {
+      "jti": "token_abc123def456",
+      "accesstoken_type": "static",
+      "AccessToken": {
+        "iss": "IAM-System",
+        "AgentID": "AgentID",
+        "iat": 1745800000,
+        "exp": null,
+        "jti": "唯一TokenID",
+        "delegated_chain": [
+          {
+            "agent_id": "UserID",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "read",
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          },
+          {
+            "agent_id": "DocAgent",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          }
+        ],
+        "scope": {
+          "doc": [
+            "write"
+          ],
+          "indata": [
+            "read_bitable"
+          ],
+          "online": []
+        },
+        "ip": "0.0.0.0",
+        "purpose": "生成一季度销售报告"
+      },
+      "expire_at": 1745803600,
+      "revoked_at": 1745802000,
+      "revoked_by": "user_001",
+      "revoke_reason": "主动撤销"
+    },
+    {
+      "jti": "token_ghi789jkl012",
+      "accesstoken_type": "dynamic",
+      "AccessToken": {
+        "iss": "IAM-System",
+        "AgentID": "AgentID",
+        "iat": 1745800000,
+        "exp": 1745810000,
+        "jti": "唯一TokenID",
+        "delegated_chain": [
+          {
+            "agent_id": "UserID",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "read",
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          },
+          {
+            "agent_id": "DocAgent",
+            "jti": "tokenID",
+            "scope": {
+              "doc": [
+                "write"
+              ],
+              "indata": [
+                "read_bitable"
+              ]
+            }
+          }
+        ],
+        "scope": {
+          "doc": [
+            "write"
+          ],
+          "indata": [
+            "read_bitable"
+          ],
+          "online": []
+        },
+        "ip": "127.0.0.1",
+        "purpose": "生成一季度销售报告"
+      },
+      "expire_at": 1745810000,
+      "revoked_at": null,
+      "revoked_by": "",
+      "revoke_reason": "还未撤销"
+    },
+    {
+      "jti": "40f99f914f534afa8b61383388875399",
+      "expire_at": 1777950955,
+      "revoked_at": 1777864555,
+      "revoked_by": "visitor_001",
+      "revoke_reason": "主动撤销"
+    },
+    {
+      "jti": "4037df62076143d28816da414906769b",
+      "expire_at": 1777980946,
+      "revoked_at": 1777977351,
+      "revoked_by": "user_1777977342_acb6d73e",
+      "revoke_reason": "测试撤销"
+    },
+    {
+      "jti": "f81dea2298864372bb5eebf0fed8ad49",
+      "expire_at": 1777981170,
+      "revoked_at": 1777977574,
+      "revoked_by": "user_1777977561_6ea0f86e",
+      "revoke_reason": "测试"
+    },
+    {
+      "jti": "5015bc5797184de48f4453a5d6e89550",
+      "expire_at": 1777981805,
+      "revoked_at": 1777978209,
+      "revoked_by": "user_1777978197_e27f991f",
+      "revoke_reason": "测试"
+    },
+    {
+      "jti": "87f9650386e549a09d7a8a1ce0549652",
+      "expire_at": 1777981999,
+      "revoked_at": 1777978403,
+      "revoked_by": "user_1777978390_748d00bd",
+      "revoke_reason": "测试"
+    }
+  ]
+}

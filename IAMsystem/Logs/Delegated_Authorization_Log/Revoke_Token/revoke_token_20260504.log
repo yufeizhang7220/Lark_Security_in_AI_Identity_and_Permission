@@ -1,0 +1,1 @@
+{"timestamp": 1777864555, "log_id": "acf34eaffba14e08a5d307bb58fa3425", "agent_id": "visitor_001", "jti": "40f99f914f534afa8b61383388875399", "revoke_reason": "主动撤销", "ip": "127.0.0.1", "status": "success", "fail_reason": "", "revoked_at": 1777864555, "revoked_by": "visitor_001"}

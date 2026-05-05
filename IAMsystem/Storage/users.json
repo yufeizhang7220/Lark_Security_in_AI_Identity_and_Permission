@@ -1,0 +1,1148 @@
+{
+  "_说明": "用户/访客身份存储表，存储所有普通用户和访客身份信息",
+  "fields_说明": {
+    "agent_id": "系统生成的唯一用户ID，全局唯一",
+    "agent_name": "用户自定义名称",
+    "subtype": "身份类型：user（普通用户）/visitor（访客）",
+    "agent_secret": "bcrypt加密后的用户密钥，不可逆",
+    "scope": "用户的静态权限集合，JSON对象",
+    "ip": "注册时绑定的IP地址",
+    "registered_at": "注册时间戳（秒）",
+    "status": "状态：active（正常）/disabled（禁用）"
+  },
+  "data": [
+    {
+      "agent_id": "user_001",
+      "agent_name": "张三",
+      "subtype": "user",
+      "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "indata": [
+          "read_bitable",
+          "read_contact"
+        ],
+        "online": [
+          "web_search"
+        ]
+      },
+      "ip": "192.168.1.100",
+      "registered_at": 1745800000,
+      "status": "active"
+    },
+    {
+      "agent_id": "visitor_001",
+      "agent_name": "外部访客",
+      "subtype": "visitor",
+      "agent_secret": "$2b$12$zHY68P8NgfrI/BNYItKqjuTe/zrsYGbazwb64i6EOUoaqvJMmvIVO",
+      "scope": {
+        "doc": [
+          "read"
+        ],
+        "online": [
+          "web_search"
+        ]
+      },
+      "ip": "202.103.24.68",
+      "registered_at": 1745810000,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777975910_fe04c505",
+      "agent_name": "张三123",
+      "subtype": "user",
+      "agent_secret": "$2b$12$gd94RM99b33QF7p7VsH3sexrSvB.j1Vs2fIryhBQDqW3acUc7NGEO",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "online": [
+          "web_search"
+        ]
+      },
+      "ip": "192.168.1.100",
+      "registered_at": 1777975910,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777976099_e01ca2e0",
+      "agent_name": "张三1234",
+      "subtype": "visitor",
+      "agent_secret": "$2b$12$XI7/r6m61yuRtOofVpz4wu5MDWvfxM3Q/qjiUo02fS6AdoXaJoKLO",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "online": [
+          "web_search"
+        ]
+      },
+      "ip": "192.168.1.100",
+      "registered_at": 1777976099,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777976937_79cec691",
+      "agent_name": "测试用户001",
+      "subtype": "user",
+      "agent_secret": "$2b$12$sEp/SRFYaLTj2slmB1B3v.o4pipw6VFP3xG4TxWcFbjV6TMjssJIC",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777976937,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977178_9a63ed3a",
+      "agent_name": "测试用户_d67ba7",
+      "subtype": "user",
+      "agent_secret": "$2b$12$x9EMq7./.RbCrSbWU4VtbuThKckwPUqISb2z.BdmK4Jf/bCbwFVay",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977178,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977299_9bd8360c",
+      "agent_name": "测试用户_1777977295_2e4e",
+      "subtype": "user",
+      "agent_secret": "$2b$12$gkk8qFuh4F1Kn4X3xaM5u.2qJzchnwp3C2.kZjtor5NmzNpr7u55m",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977299,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977308_1ad3950a",
+      "agent_name": "测试用户_1777977304_135a",
+      "subtype": "user",
+      "agent_secret": "$2b$12$uT5Ysmpx1hgB/wdO37zXMu58n3upCIDYswL4gKr21NMCOGbqXR5S6",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977308,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977316_14242d41",
+      "agent_name": "测试用户_1777977312_0406",
+      "subtype": "user",
+      "agent_secret": "$2b$12$XHZpNTpDVjT.EnICyQpYYugX6jRERm5GqdFc0KunjYK40Jx3abrS.",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977316,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977325_04ce68c9",
+      "agent_name": "测试用户_1777977321_2455",
+      "subtype": "user",
+      "agent_secret": "$2b$12$2XYs2UlZ1EvNQyw7koTK3O0hvTdxOV2VRUGhSQIZ8B1OgUu39AHmW",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977325,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977342_acb6d73e",
+      "agent_name": "测试用户_1777977338_8cb1",
+      "subtype": "user",
+      "agent_secret": "$2b$12$rh/itsxz6wHyHZQ.tvXOD.1O/pHXzM77FIadddAlOxLxtH0xHcvn.",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977342,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977357_e9daf34a",
+      "agent_name": "测试用户_1777977353_39df",
+      "subtype": "user",
+      "agent_secret": "$2b$12$reo9GYuTjq/soC34Yl1oUuCrFhZpXXAdbO.cQc4fC4UR7gqYmxLA6",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977357,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977504_765288f5",
+      "agent_name": "测试用户_1777977500_bc11",
+      "subtype": "user",
+      "agent_secret": "$2b$12$m1/WMKkpeoEdwJqbt7gRc.usC6DzgwdqTpOFw8NfSDOf83Dc284.u",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977504,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977516_66c4a550",
+      "agent_name": "测试用户_1777977511_e19f",
+      "subtype": "user",
+      "agent_secret": "$2b$12$yeFjhSfdqmSkluuFOhqBieYNvZ8bH8l.i..VKxhRXMi66E66mSFQC",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977516,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977525_b2969748",
+      "agent_name": "测试用户_1777977520_8f85",
+      "subtype": "user",
+      "agent_secret": "$2b$12$IZtkMEo0r4sLE4VbxZTP8.Ej00AJEy0AfW9H6Gf6it4rrIa.N6nuq",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977525,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977540_bda5ba19",
+      "agent_name": "测试用户_1777977535_f053",
+      "subtype": "user",
+      "agent_secret": "$2b$12$rm83k7ntTqNvLEIIwuARJOqoGutTumXm6gM2cu7VGdTXMptiB.b7e",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977540,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977546_1b340ae7",
+      "agent_name": "测试用户_1777977542_3e92",
+      "subtype": "user",
+      "agent_secret": "$2b$12$shQDLL./aQPo0Q9fskl.aeKJ9jtxlh6/2SpSImZVIBF2hxhxdmzpK",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977546,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977561_6ea0f86e",
+      "agent_name": "测试用户_1777977557_2a9b",
+      "subtype": "user",
+      "agent_secret": "$2b$12$6vbHoqaSplHYgYssYu0XR.apYax54SaBHB0IP3KCRHJnMSIDCnbW.",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977561,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777977581_72368984",
+      "agent_name": "测试用户_1777977576_2d3e",
+      "subtype": "user",
+      "agent_secret": "$2b$12$mJT5FPhHVJQeUnwPpR0B/uhpuzDMrNRasC9MNU41pNOADT4vJhlGG",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777977581,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978140_f60cc5cf",
+      "agent_name": "测试用户_1777978135_f09d",
+      "subtype": "user",
+      "agent_secret": "$2b$12$cf25vEA8V0NWigRnCJcDy.PAHfUCvXdbrjYW0lpZ.jb4w.v6nh4ce",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978140,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978151_052be7a7",
+      "agent_name": "测试用户_1777978147_e675",
+      "subtype": "user",
+      "agent_secret": "$2b$12$g3/6WZTrReB8F2EVroki8ufSyedS9rqNZ18lSk9wvF7eKEBGema9a",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978151,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978160_7f2e6bdb",
+      "agent_name": "测试用户_1777978156_c0a3",
+      "subtype": "user",
+      "agent_secret": "$2b$12$x4X.3O..PrPu/rg6iIMMeOl.5j7amT9QpDQ23OLGsqQl9I68GLQZq",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978160,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978175_b5bb55cd",
+      "agent_name": "测试用户_1777978171_c33b",
+      "subtype": "user",
+      "agent_secret": "$2b$12$fQu5di/j013NNfk6c6ALLeihS/BxaURoMLhaeStxJpzbdiLzr2e0W",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978175,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978182_e56f377b",
+      "agent_name": "测试用户_1777978177_a3d4",
+      "subtype": "user",
+      "agent_secret": "$2b$12$ZHOze4/ei0D548t71GJCQuQOluCakxaOhr7U0axPCXjCQO4NkefB.",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978182,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978197_e27f991f",
+      "agent_name": "测试用户_1777978192_41c1",
+      "subtype": "user",
+      "agent_secret": "$2b$12$QFoNkOW3h5Jx7LIeY32h2.jSzydW.OD0uqqJc/SPbbBgx8W/hwU1q",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978197,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978216_65a9bb25",
+      "agent_name": "测试用户_1777978212_1455",
+      "subtype": "user",
+      "agent_secret": "$2b$12$gWI0XmlZ0iU5wcil5t/lAuOJgIEsfJjt3bA49gWMw8i0yq1JBmzYC",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978216,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978334_29384081",
+      "agent_name": "测试用户_1777978329_4f90",
+      "subtype": "user",
+      "agent_secret": "$2b$12$eY3QSHA2.me8XEndW/WPmudIOYWeJB5CTuRM.Aqv0ofb6w2muszfy",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978334,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978345_76fea388",
+      "agent_name": "测试用户_1777978341_f4a8",
+      "subtype": "user",
+      "agent_secret": "$2b$12$YNl4cGWHwy37DZ86.AzKrOxTED4Wh3YLeEuwjTr3AuYoL2oYFfSo2",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978345,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978354_874a5560",
+      "agent_name": "测试用户_1777978349_0ff1",
+      "subtype": "user",
+      "agent_secret": "$2b$12$AaXeuMYY7K.2S8/4YjPMMuj1W/YqtBQHC9e4UMdI9ccNFVrSgoJo2",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978354,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978369_d8f8aa49",
+      "agent_name": "测试用户_1777978364_4be7",
+      "subtype": "user",
+      "agent_secret": "$2b$12$rgfdIuNNXcU3WfH3Qjij4.uYwvb0zLvMLEl6xZ8703HJmWtpPwASG",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978369,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978375_e62ceb94",
+      "agent_name": "测试用户_1777978371_0324",
+      "subtype": "user",
+      "agent_secret": "$2b$12$mFYLMtIr6F8Yflp4gkxjMOE0S5x23yhNYVQneAkz29.UQKK2g3mey",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978375,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978390_748d00bd",
+      "agent_name": "测试用户_1777978386_0cc1",
+      "subtype": "user",
+      "agent_secret": "$2b$12$/2f.7RBNUxdk7Dj4NeJjH.wfJJ40QvZus4diz1zNQtPaRJx2ODR4C",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978390,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978410_b316e4c0",
+      "agent_name": "测试用户_1777978405_7d6d",
+      "subtype": "user",
+      "agent_secret": "$2b$12$TGgPFHDusPqnJRWA8DJGB.oCrhd5ZTN8dorKLcUamSnqjAJ5wIbZG",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978410,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978573_f7754a97",
+      "agent_name": "测试用户_1777978568_1a4b",
+      "subtype": "user",
+      "agent_secret": "$2b$12$0dL66WydNbIO6.dp6RZ0sedl2zGr9QHD540o9rO1f52xuedSw0SNC",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978573,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978581_f22c1610",
+      "agent_name": "测试用户_1777978577_0e16",
+      "subtype": "user",
+      "agent_secret": "$2b$12$fwB3lADw.JpC3tJB2nRsm.z2th2dEd/AjvsjZs1wApktY6Y6lXX66",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978581,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978629_6fc7da1d",
+      "agent_name": "测试用户_1777978625_cb3d",
+      "subtype": "user",
+      "agent_secret": "$2b$12$pjm6J6nAxfvJ9C0GA43rzec84v6iHEiy.Lu5OYh7FdI5AQRU68vgS",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978629,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978680_6b1f40e6",
+      "agent_name": "测试用户_1777978676_2d58",
+      "subtype": "user",
+      "agent_secret": "$2b$12$qguGLjlbMhcYENuc4yffduTQNp9OpKe5wE1fQpTRKlGybe2nvMtle",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978680,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978688_d52f6d53",
+      "agent_name": "<script>alert('xss')</script>'; DROP TABLE users; --",
+      "subtype": "user",
+      "agent_secret": "$2b$12$J.x3nk/rZmS9hZ2kBWqJauOtCy7YT.tQB/ty4biiKOK5VWvn32gpG",
+      "scope": {
+        "doc": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978688,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978693_6938f33a",
+      "agent_name": "测试用户_1777978688_7c92",
+      "subtype": "user",
+      "agent_secret": "$2b$12$cOy6GyMtvf6ZPVBdshHE5OIvhEgtb1alhRgSeiOjpbmWZxeYXRpSO",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978693,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978699_ab71a94a",
+      "agent_name": "测试用户_1777978695_2b40",
+      "subtype": "user",
+      "agent_secret": "$2b$12$jqxkU1FYPvjH9OBK5tExiOdAT6SpBSNr2kYXXSeYzFFl4wM/R2g/q",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978699,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978708_663137e6",
+      "agent_name": "测试用户_1777978703_d514",
+      "subtype": "user",
+      "agent_secret": "$2b$12$AqclVf/gpMBS49jKUNc2HugKncKELy7Do6fO5q9G.9sHSTLJrdY4u",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978708,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978850_f65ece7d",
+      "agent_name": "测试用户_1777978846_f663",
+      "subtype": "user",
+      "agent_secret": "$2b$12$.dGjXNDlHf38XDzTFn1Mg.0Vb1HRBSHM7jPQwVZLP5obZUSkjS8k2",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978850,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978859_9886b92a",
+      "agent_name": "测试用户_1777978855_11e1",
+      "subtype": "user",
+      "agent_secret": "$2b$12$9/dH.PwYrQgLOTEtDk3Ym.YOADRDM9LkOxH3og6yRs2.fWFdks8ta",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978859,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777978907_c0fbf7ad",
+      "agent_name": "测试用户_1777978903_e825",
+      "subtype": "user",
+      "agent_secret": "$2b$12$sMegxKq8S/MmZsoigVS4e.nHSYZIO/KWfkSrjMToVkUMAfUpWcW/a",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777978907,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979002_de0f2363",
+      "agent_name": "测试用户_1777978998_6d2b",
+      "subtype": "user",
+      "agent_secret": "$2b$12$RYaTxqB6Aaj04Vn.ct0Wle.ovXsE02q37F2bANYrI.8HG0iFPHIHC",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979002,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979015_6392c2b7",
+      "agent_name": "测试用户_1777979010_deca",
+      "subtype": "user",
+      "agent_secret": "$2b$12$XfxmAT8i7iQnWETNBa8cme4mRyccxe60pVDIw8lCGfxHgTx3U2zou",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979015,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979021_90f31402",
+      "agent_name": "测试用户_1777979017_314a",
+      "subtype": "user",
+      "agent_secret": "$2b$12$vwj20DiRm7Pa5GobeWt3.uz6GL3iPOWKTL1.R8dqw28yqVNuiMrVK",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979021,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979030_8f36353d",
+      "agent_name": "测试用户_1777979026_221a",
+      "subtype": "user",
+      "agent_secret": "$2b$12$y5KOX7lmFUiajfjA4m0PFeD0CxRm/2fvPMZg.YotINg4jYoYor/Ui",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979030,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979514_2804ef70",
+      "agent_name": "测试用户_1777979510_9f12",
+      "subtype": "user",
+      "agent_secret": "$2b$12$GtjGC2mJP4.go7/eiCMAo.xJds3SDfgrQnCdVKtBbZYG4xKmDjovS",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979514,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979616_7d10e9ef",
+      "agent_name": "测试用户_1777979611_0d00",
+      "subtype": "user",
+      "agent_secret": "$2b$12$5fuwBn7ofCgPKTOumdLKzORr2AVbst6q6DgYo16HtlEhTitw/ueQG",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979616,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979628_6f742c43",
+      "agent_name": "测试用户_1777979624_8f08",
+      "subtype": "user",
+      "agent_secret": "$2b$12$hOBGO.w5OzmuwCs0ix8d0OtoSs6erO7z6Ceb/fBA2CmsIGaw.BwoS",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979628,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979685_07c49cab",
+      "agent_name": "测试用户_1777979681_f926",
+      "subtype": "user",
+      "agent_secret": "$2b$12$7up0cizcMzTQM26WNG9GnOilJjJiJoFreIpeOIYLx9f8BYJn16Q9m",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979685,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979823_8d522cd9",
+      "agent_name": "测试用户_1777979819_5766",
+      "subtype": "user",
+      "agent_secret": "$2b$12$YR3VaqXtZ372JekCyLvLZu3SMRortzEK/G34wFtdoX7ivqKfiEgOy",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979823,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979839_1a2644af",
+      "agent_name": "测试用户_1777979835_b0f3",
+      "subtype": "user",
+      "agent_secret": "$2b$12$xa4aqwa65tUwTC6h.izJDuowR29ptFLEvSTtX2g833Hwa/ymo/ina",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979839,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979850_64577ef3",
+      "agent_name": "测试用户_1777979846_0cef",
+      "subtype": "user",
+      "agent_secret": "$2b$12$9K8UfQt6TPI09Byb/Px58.XrBBdNgtgCeqPRr5SiDMcqbYxZ0eh8u",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979850,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777979863_cd729cb4",
+      "agent_name": "测试用户_1777979858_9d66",
+      "subtype": "user",
+      "agent_secret": "$2b$12$N3o/o0dVUBnsy/jlBPwwteeLcL6C9/hE3WeXD1pf4XOimii5cDCOy",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777979863,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980039_72f181c6",
+      "agent_name": "测试用户_1777980035_f2cd",
+      "subtype": "user",
+      "agent_secret": "$2b$12$Eci0M5KUCzG75pP07xGW3OkSTndjA1rBKnWCKYopJfpegMaglNOvG",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980039,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980052_0050bd86",
+      "agent_name": "测试用户_1777980047_f4f9",
+      "subtype": "user",
+      "agent_secret": "$2b$12$ONYLGik6NYqFAj3OvZUqg.aekUjBisba9otRfeSAlwMV8FoSZu48C",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980052,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980109_c364f21a",
+      "agent_name": "测试用户_1777980104_d593",
+      "subtype": "user",
+      "agent_secret": "$2b$12$2jQZCmSNdxQWNi.7.dShouhjkBo41jFDE0E.3PGRhA2UIq6cAV3PS",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980109,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980316_733597a9",
+      "agent_name": "测试用户_1777980312_454e",
+      "subtype": "user",
+      "agent_secret": "$2b$12$SIz6gLl9GJ9xdlOYfHnXyupF.TQMVbiGENQyZ4o/6sS5pX.IdfeTq",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980316,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980333_610de511",
+      "agent_name": "测试用户_1777980329_fc9f",
+      "subtype": "user",
+      "agent_secret": "$2b$12$amStmCF0VDNg5QIgsR/eVO5CkMxedMcYooCC2EHipH2OCM.TUOu4a",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980333,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980344_453f1205",
+      "agent_name": "测试用户_1777980339_a2ae",
+      "subtype": "user",
+      "agent_secret": "$2b$12$VRO7KzK1UrpEsYzR3LIAOO7eFd31FdF/X8JNRkZwo51I3A7WU3od.",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980344,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1777980356_aadb9feb",
+      "agent_name": "测试用户_1777980352_92c7",
+      "subtype": "user",
+      "agent_secret": "$2b$12$sgmZxxnlBuzatso1Ce6HSe36UhKQs9YKAdcQ0Oq6GLPl1dyMrPMhS",
+      "scope": {
+        "doc": [
+          "read",
+          "write"
+        ],
+        "base": [
+          "read"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1777980356,
+      "status": "active"
+    }
+  ]
+}
