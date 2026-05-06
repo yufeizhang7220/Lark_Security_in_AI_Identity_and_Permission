@@ -34,6 +34,21 @@ MODULES = [
         "port": 9002,
         "health_check": "/IAMsystem/identity/health",
         "description": "负责用户和Bot身份注册、身份校验"
+    },
+    {
+        "name": "管理后台模块",
+        "dir": "Admin",
+        "port": 9005,
+        "health_check": "/IAMsystem/admin/health",
+        "description": "负责后台管理、违规记录查询、系统配置"
+    },
+    {
+        "name": "前端静态服务",
+        "dir": "WebPages",
+        "port": 9006,
+        "health_check": "/",
+        "description": "管理前端静态页面服务，访问地址: http://localhost:9006",
+        "type": "static"
     }
 ]
 
@@ -56,20 +71,32 @@ def run_module(module_config: Dict):
     sys.path.insert(0, module_dir)
     
     try:
-        # 导入模块的app并启动
-        from main import app
         import uvicorn
-        print(f"✅ {module_config['name']} 启动成功，访问地址: http://localhost:{module_config['port']}")
-        print(f"   健康检查: http://localhost:{module_config['port']}{module_config['health_check']}")
-        print(f"   描述: {module_config['description']}\n")
-        uvicorn.run(app, host="0.0.0.0", port=module_config["port"], log_level="info")
+        # 静态文件服务特殊处理
+        if module_config.get("type") == "static":
+            from fastapi import FastAPI
+            from fastapi.staticfiles import StaticFiles
+            app = FastAPI(title="前端静态服务")
+            # 挂载静态文件到根路径
+            app.mount("/", StaticFiles(directory=".", html=True), name="static")
+            print(f"✅ {module_config['name']} 启动成功，访问地址: http://localhost:{module_config['port']}")
+            print(f"   健康检查: http://localhost:{module_config['port']}{module_config['health_check']}")
+            print(f"   描述: {module_config['description']}\n")
+            uvicorn.run(app, host="0.0.0.0", port=module_config["port"], log_level="warning")
+        else:
+            # 导入模块的app并启动
+            from main import app
+            print(f"{module_config['name']} 启动成功，访问地址: http://localhost:{module_config['port']}")
+            print(f"   健康检查: http://localhost:{module_config['port']}{module_config['health_check']}")
+            print(f"   描述: {module_config['description']}\n")
+            uvicorn.run(app, host="0.0.0.0", port=module_config["port"], log_level="info")
     except Exception as e:
-        print(f"❌ {module_config['name']} 启动失败: {str(e)}", file=sys.stderr)
+        print(f"{module_config['name']} 启动失败: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 def main():
     print("=" * 60)
-    print("🚀 IAM系统 一键启动脚本")
+    print("IAM系统 一键启动脚本")
     print("=" * 60)
     print(f"共有 {len(MODULES)} 个核心模块待启动\n")
 
@@ -86,7 +113,7 @@ def main():
         time.sleep(1)  # 间隔启动避免端口冲突和日志混乱
 
     print("\n" + "=" * 60)
-    print("✨ 所有模块已启动完成，按 Ctrl+C 停止所有服务")
+    print("所有模块已启动完成，按 Ctrl+C 停止所有服务")
     print("=" * 60 + "\n")
 
     # 等待所有进程结束

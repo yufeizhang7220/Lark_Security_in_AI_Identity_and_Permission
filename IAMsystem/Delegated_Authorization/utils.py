@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from config import (
     JWT_SECRET, JWT_ALGORITHM, MAX_TOKEN_TTL,
-    USERS_JSON_PATH, BOTS_JSON_PATH, TOKEN_BLACKLIST_PATH, BLACKLIST_PATH,
+    USERS_JSON_PATH, BOTS_JSON_PATH, TOKEN_BLACKLIST_PATH, BLACKLIST_PATH, TOKEN_CONFIG_PATH,
     APPLY_TOKEN_LOG_DIR, VERIFY_TOKEN_LOG_DIR, REVOKE_TOKEN_LOG_DIR,
     AUDIT_API_URL
 )
@@ -28,6 +28,31 @@ def read_json_file(file_path: str) -> Dict:
             return json.load(f)
     except Exception:
         return {"data": []}
+
+# 读取Token全局配置
+def read_token_config() -> Dict:
+    """读取Token全局配置"""
+    default_config = {
+        "global_token_mode": "dynamic",  # 可选值: dynamic(全局动态)/static(全局静态)/custom(用户自定义)
+        "allow_custom_mode": True,
+        "static_token_max_ttl": 2592000,  # 静态Token最长有效期，默认30天
+        "dynamic_token_max_ttl": 86400  # 动态Token最长有效期，默认24小时
+    }
+    if not os.path.exists(TOKEN_CONFIG_PATH):
+        write_json_file(TOKEN_CONFIG_PATH, default_config)
+        return default_config
+    try:
+        with open(TOKEN_CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+            # 合并默认配置，确保字段完整
+            return {**default_config, **config}
+    except Exception:
+        return default_config
+
+# 保存Token全局配置
+def save_token_config(config: Dict) -> bool:
+    """保存Token全局配置"""
+    return write_json_file(TOKEN_CONFIG_PATH, config)
 # 读取全局黑名单
 def read_global_blacklist() -> Dict:
     """读取全局黑名单文件"""
@@ -115,23 +140,27 @@ def calculate_scope_intersection(scopes: List[Dict]) -> Dict:
     return result
 
 # 检查已授予的权限是否满足所需权限
-def check_scope_sufficient(granted_scope: Dict, required_scope: Dict) -> bool:
-    """检查已授予的权限是否满足所需权限"""
+def check_scope_sufficient(granted_scope: Dict, required_scope: Dict) -> Tuple[bool, Dict]:
+    """检查已授予的权限是否满足所需权限
+    返回: (是否满足, 缺失的权限字典)
+    """
+    missing_scope = {}
     for resource_type, required_perms in required_scope.items():
         # 如果资源类型不存在，直接不满足
         if resource_type not in granted_scope:
-            return False
+            missing_scope[resource_type] = required_perms
+            continue
         
         granted_perms = set(granted_scope[resource_type])
         # 如果有all权限，直接满足
         if "all" in granted_perms:
-            return True
+            continue
         # 检查所有需要的权限都在已授予列表中
-        for perm in required_perms:
-            if perm not in granted_perms:
-                return False
+        missing_perms = [perm for perm in required_perms if perm not in granted_perms]
+        if missing_perms:
+            missing_scope[resource_type] = missing_perms
     
-    return True
+    return len(missing_scope) == 0, missing_scope
 
 # ------------------------------ JWT工具 ------------------------------
 # 生成JWT格式的AccessToken
@@ -147,6 +176,7 @@ def generate_jwt(
     """生成JWT格式的AccessToken"""
     jti = str(uuid.uuid4()).replace("-", "")
     now = int(time.time())
+    token_config = read_token_config()
     
     payload = {
         "iss": "IAM-System",
@@ -156,29 +186,36 @@ def generate_jwt(
         "delegated_chain": delegated_chain,
         "scope": scope,
         "ip": ip if token_type == "dynamic" else "0.0.0.0",
-        "purpose": purpose
+        "purpose": purpose,
+        "token_type": token_type
     }
     
-    # 动态Token设置过期时间，静态Token不设置过期时间
+    # 根据Token类型和配置设置过期时间
     if token_type == "dynamic":
-        ttl = min(ttl, MAX_TOKEN_TTL)
+        max_ttl = token_config.get("dynamic_token_max_ttl", MAX_TOKEN_TTL)
+        ttl = min(ttl, max_ttl)
         exp = now + ttl
         payload["exp"] = exp
     else:
-        exp = None
+        max_ttl = token_config.get("static_token_max_ttl", 2592000)
+        ttl = min(ttl, max_ttl)
+        exp = now + ttl
+        payload["exp"] = exp
     
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token, exp, jti
 
 # 解析并验证JWT，验证失败返回None
-def decode_jwt(token: str) -> Optional[Dict]:
+def decode_jwt(token: str, verify_exp: bool = True) -> Optional[Dict]:
     """解析并验证JWT，验证失败返回None"""
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": True})
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": verify_exp})
+        # 手动检查过期时间
+        if verify_exp and "exp" in payload:
+            now = int(time.time())
+            if payload["exp"] < now:
+                return None
         return payload
-    except jwt.ExpiredSignatureError:
-        # Token过期
-        return None
     except Exception:
         # 签名错误或其他验证失败
         return None

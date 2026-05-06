@@ -12,17 +12,48 @@ from config import DOCS_DIR, AGENT_CONFIG as CONFIG
 # 项目根目录
 project_root = os.path.dirname(os.path.abspath(__file__))
 
+# 配置文件路径
+STORAGE_DIR = os.path.join(project_root, "Storage")
+REG_INFO_FILE = os.path.join(STORAGE_DIR, "IMA_reg_info.json")
+ACCESS_TOKENS_FILE = os.path.join(STORAGE_DIR, "AccessTokens.json")
+
+# IAM系统配置
+IAM_IDENTITY_ENDPOINT = "http://localhost:9002/IAMsystem/identity"
+IAM_AUTH_ENDPOINT = "http://localhost:9001/IAMsystem/auth"
+
+# Agent配置
+AGENT_NAME = "Lark-doc-Agent"
+AGENT_SCOPE = {
+    "doc": ["all"],
+    "indata": ["read_contact", "read_calendar", "read_bitable"],
+    "online": ["web_search", "fetch_content"],
+    "iam": ["apply_token", "verify_token"]
+}
+
+# 全局存储：AgentSecret和AccessToken，避免重复申请
+AGENT_CONFIG = {
+    "agent_id": "",
+    "agent_secret": "",
+    "access_token": "",
+    "token_expire": 0
+}
+
 # 工具函数：读取本地注册信息
 def load_local_reg_info():
     """加载本地存储的注册信息"""
     try:
         if os.path.exists(REG_INFO_FILE):
-            with open(REG_INFO_FILE, "r", encoding="utf-8") as f:
-                reg_info = json.load(f)
-                if AGENT_CONFIG["AgentID"] in reg_info:
-                    agent_info = reg_info[AGENT_CONFIG["AgentID"]]
-                    AGENT_CONFIG["AgentSecret"] = agent_info.get("AgentSecret", "")
-                    return True
+            try:
+                with open(REG_INFO_FILE, "r", encoding="utf-8") as f:
+                    reg_info = json.load(f)
+                    if AGENT_NAME in reg_info:
+                        agent_info = reg_info[AGENT_NAME]
+                        AGENT_CONFIG["agent_id"] = agent_info.get("agent_id", "")
+                        AGENT_CONFIG["agent_secret"] = agent_info.get("agent_secret", "")
+                        return True
+            except:
+                # 文件为空或损坏，返回False重新注册
+                pass
     except:
         pass
     return False
@@ -34,10 +65,14 @@ def save_local_reg_info(agent_info: Dict):
         os.makedirs(STORAGE_DIR, exist_ok=True)
         reg_info = {}
         if os.path.exists(REG_INFO_FILE):
-            with open(REG_INFO_FILE, "r", encoding="utf-8") as f:
-                reg_info = json.load(f)
+            try:
+                with open(REG_INFO_FILE, "r", encoding="utf-8") as f:
+                    reg_info = json.load(f)
+            except:
+                # 文件为空或损坏，重置为空字典
+                reg_info = {}
         
-        reg_info[agent_info["AgentID"]] = agent_info
+        reg_info[AGENT_NAME] = agent_info
         with open(REG_INFO_FILE, "w", encoding="utf-8") as f:
             json.dump(reg_info, f, ensure_ascii=False, indent=4)
         return True
@@ -45,32 +80,233 @@ def save_local_reg_info(agent_info: Dict):
         return False
 
 # 工具函数：读取本地AccessToken
-def load_local_access_tokens():
+def load_local_access_token():
     """加载本地存储的AccessToken，返回有效的token"""
     try:
         current_time = int(time.time())
         if os.path.exists(ACCESS_TOKENS_FILE):
-            with open(ACCESS_TOKENS_FILE, "r", encoding="utf-8") as f:
-                tokens = json.load(f)
-                # 查找Lark-doc-Agent的有效token
-                for token_id, token_info in tokens.items():
-                    if token_info.get("AgentID") == AGENT_CONFIG["AgentID"]:
+            try:
+                with open(ACCESS_TOKENS_FILE, "r", encoding="utf-8") as f:
+                    tokens = json.load(f)
+                    # 查找Lark-doc-Agent的有效token
+                    if AGENT_CONFIG["agent_id"] in tokens:
+                        token_info = tokens[AGENT_CONFIG["agent_id"]]
                         # 检查是否有效
-                        if token_info.get("exp") == -1 or token_info.get("exp", 0) > current_time:
-                            AGENT_CONFIG["AccessToken"] = token_info.get("AgentSecret", "")
-                            AGENT_CONFIG["TokenExpire"] = token_info.get("exp", 0)
+                        if token_info.get("expire_at") == -1 or token_info.get("expire_at", 0) > current_time:
+                            AGENT_CONFIG["access_token"] = token_info.get("access_token", "")
+                            AGENT_CONFIG["token_expire"] = token_info.get("expire_at", 0)
                             return True
+            except:
+                # 文件为空或损坏，返回False重新申请
+                pass
     except:
         pass
     return False
 
+# 工具函数：保存AccessToken到本地
+def save_access_token(token_info: Dict):
+    """保存AccessToken到本地文件"""
+    try:
+        os.makedirs(STORAGE_DIR, exist_ok=True)
+        tokens = {}
+        if os.path.exists(ACCESS_TOKENS_FILE):
+            try:
+                with open(ACCESS_TOKENS_FILE, "r", encoding="utf-8") as f:
+                    tokens = json.load(f)
+            except:
+                # 文件为空或损坏，重置为空字典
+                tokens = {}
+        
+        tokens[AGENT_CONFIG["agent_id"]] = token_info
+        with open(ACCESS_TOKENS_FILE, "w", encoding="utf-8") as f:
+            json.dump(tokens, f, ensure_ascii=False, indent=4)
+        return True
+    except:
+        return False
+
 # 服务启动时加载本地配置
 load_local_reg_info()
-load_local_access_tokens()
+load_local_access_token()
+
+# 身份注册工具
+def iam_register_user() -> Dict:
+    """注册用户身份到IAM系统"""
+    try:
+        if AGENT_CONFIG["agent_id"] and AGENT_CONFIG["agent_secret"]:
+            return {"success": True, "message": "已完成注册，无需重复注册", "agent_id": AGENT_CONFIG["agent_id"]}
+        
+        register_data = {
+            "Agent_name": AGENT_NAME,
+            "subtype": "user",
+            "scope": AGENT_SCOPE,
+            "ip": "127.0.0.1"
+        }
+        
+        response = httpx.post(
+            f"{IAM_IDENTITY_ENDPOINT}/register/user",
+            json=register_data,
+            timeout=30
+        )
+        result = response.json()
+        
+        # 记录IAM注册日志
+        from main import write_iam_log
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        write_iam_log(time_str, "register/user", register_data, result)
+        
+        if result.get("code") == 201:
+            agent_info = result["data"]
+            AGENT_CONFIG["agent_id"] = agent_info["agent_id"]
+            AGENT_CONFIG["agent_secret"] = agent_info["agent_secret"]
+            save_local_reg_info(agent_info)
+            return {"success": True, "message": "注册成功", "agent_id": agent_info["agent_id"]}
+        else:
+            return {"success": False, "error": result.get("message", "注册失败")}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# 申请AccessToken工具
+def iam_apply_access_token(scope: Dict = None, ttl: int = 3600) -> Dict:
+    """申请AccessToken，自动处理注册逻辑"""
+    try:
+        # 首先检查是否已注册
+        if not AGENT_CONFIG["agent_id"] or not AGENT_CONFIG["agent_secret"]:
+            reg_result = iam_register_user()
+            if not reg_result["success"]:
+                return reg_result
+        
+        # 检查现有token是否有效
+        current_time = int(time.time())
+        if AGENT_CONFIG["access_token"] and AGENT_CONFIG["token_expire"] > current_time + 60:
+            return {"success": True, "access_token": AGENT_CONFIG["access_token"], "expire_at": AGENT_CONFIG["token_expire"]}
+        
+        # 申请新token
+        apply_data = {
+            "agent_id": AGENT_CONFIG["agent_id"],
+            "agent_secret": AGENT_CONFIG["agent_secret"],
+            "applied_scope": scope if scope else AGENT_SCOPE,
+            "purpose": "文档生成工具调用",
+            "ttl": ttl,
+            "token_type": "dynamic"
+        }
+        
+        response = httpx.post(
+            f"{IAM_AUTH_ENDPOINT}/apply-token",
+            json=apply_data,
+            timeout=30
+        )
+        result = response.json()
+        
+        # 记录IAM Token申请日志
+        from main import write_iam_log
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        write_iam_log(time_str, "apply-token", apply_data, result)
+        
+        if result.get("code") == 200:
+            token_data = result["data"]
+            AGENT_CONFIG["access_token"] = token_data["access_token"]
+            AGENT_CONFIG["token_expire"] = token_data["expire_at"]
+            save_access_token(token_data)
+            return {"success": True, "access_token": token_data["access_token"], "expire_at": token_data["expire_at"]}
+        else:
+            return {"success": False, "error": result.get("message", "Token申请失败")}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# 调用企业数据Agent
+def call_indata_agent(query_type: str, query_params: Dict = None) -> Dict:
+    """调用企业数据Agent获取内部数据"""
+    try:
+        # 先获取有效token
+        token_result = iam_apply_access_token({"indata": ["read_contact", "read_calendar", "read_bitable"]})
+        if not token_result["success"]:
+            return token_result
+        
+        headers = {
+            "Authorization": f"Bearer {token_result['access_token']}",
+            "Content-Type": "application/json"
+        }
+        
+        request_data = {
+            "context": {
+                "task_type": "query_data",
+                "Agent_data": {
+                    "query_type": query_type,
+                    "query_data": query_params if query_params else {}
+                }
+            }
+        }
+        
+        response = httpx.post(
+            "http://localhost:9300/Agent_indata/api/query",
+            json=request_data,
+            headers=headers,
+            timeout=30
+        )
+        result = response.json()
+        
+        # 记录企业数据Agent调用日志
+        from main import write_iam_log
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        write_iam_log(time_str, "call_indata_agent", request_data, result)
+        
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# 调用外部检索Agent
+def call_external_search_agent(keyword: str, search_params: Dict = None) -> Dict:
+    """调用外部检索Agent获取公开信息"""
+    try:
+        # 先获取有效token
+        token_result = iam_apply_access_token({"online": ["web_search", "fetch_content"]})
+        if not token_result["success"]:
+            return token_result
+        
+        headers = {
+            "Authorization": f"Bearer {token_result['access_token']}",
+            "Content-Type": "application/json"
+        }
+        
+        search_params = search_params if search_params else {}
+        # 适配外部检索Agent标准接口格式
+        request_data = {
+            "action": "web_search",
+            "query": keyword,
+            "num_results": search_params.get("num_results", 5),
+            # 透传其他搜索参数
+            **{k: v for k, v in search_params.items() if k != "num_results"}
+        }
+        
+        response = httpx.post(
+            "http://localhost:9200/External-Search-Agent/api/query",
+            json=request_data,
+            headers=headers,
+            timeout=30
+        )
+        result = response.json()
+        
+        # 兼容原有返回格式，适配旧代码
+        if result.get("success") and "results" in result:
+            # 将结果格式转换为原有系统期望的格式
+            result["data"] = {
+                "search_results": result["results"],
+                "total": result.get("total", len(result["results"])),
+                "query": result.get("query", keyword)
+            }
+        
+        # 记录外部检索Agent调用日志
+        from main import write_iam_log
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        write_iam_log(time_str, "call_external_search_agent", request_data, result)
+        
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 # 工具调用逻辑
 def call_tool(tool_name: str, params: Dict) -> Dict:
-    """调用SKILLS中的工具或IAM系统API"""
+    """调用SKILLS中的工具"""
     time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
         result = {}
@@ -82,161 +318,14 @@ def call_tool(tool_name: str, params: Dict) -> Dict:
         elif tool_name == "login_larkcli":
             login_url = login_larkcli()
             result = {"success": True, "login_url": login_url}
-        elif tool_name == "iam_register_agent":
-            # 调用IAM身份注册API
-            register_data = {
-                "AgentID": params.get("AgentID", AGENT_CONFIG["AgentID"]),
-                "Subtype": params.get("Subtype", "bot"),
-                "scope": params["scope"],
-                "ip": params.get("ip", "127.0.0.1")
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Identity_Registration/register/bot",
-                json=register_data,
-                timeout=30
-            )
-            result = response.json()
-            # 注册成功保存AgentSecret到内存和本地文件
-            if result.get("code") == 201:
-                agent_info = result["data"]
-                AGENT_CONFIG["AgentSecret"] = agent_info["AgentSecret"]
-                # 保存到本地文件
-                save_local_reg_info({
-                    "AgentID": agent_info["AgentID"],
-                    "Subtype": agent_info["Subtype"],
-                    "scope": agent_info["scope"],
-                    "AgentSecret": agent_info["AgentSecret"],
-                    "registered_at": agent_info["registered_at"],
-                    "ip": register_data["ip"]
-                })
+        elif tool_name == "iam_register_user":
+            result = iam_register_user()
         elif tool_name == "iam_apply_access_token":
-            # 调用IAM委托授权API
-            auth_data = {
-                "AgentID": params.get("AgentID", AGENT_CONFIG["AgentID"]),
-                "Subtype": params.get("Subtype", "user"),
-                "AgentSecret": params["AgentSecret"],
-                "purpose": params.get("purpose", "访问系统API"),
-                "scope": params["scope"],
-                "time": params.get("time", 3600)
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Delegated_Authorization",
-                json=auth_data,
-                timeout=30
-            )
-            result = response.json()
-            # 申请成功保存AccessToken到内存和本地文件
-            if result.get("status") == 601 and result.get("AccessToken"):
-                token_info = result["AccessToken"]
-                AGENT_CONFIG["AccessToken"] = token_info["AgentSecret"]
-                AGENT_CONFIG["TokenExpire"] = token_info["exp"]
-                # 保存到本地文件
-                save_access_token(token_info)
-        elif tool_name == "iam_list_tools":
-            # 获取IAM系统所有可用工具列表
-            if not AGENT_CONFIG["AccessToken"]:
-                return {"error": "缺少有效的AccessToken，请先调用iam_apply_access_token申请令牌"}
-            # 构造请求
-            request_data = {
-                "task_type": "list_tools",
-                "AccessToken": {
-                    "token_id": "",
-                    "AgentID": AGENT_CONFIG["AgentID"],
-                    "AgentSecret": AGENT_CONFIG["AccessToken"],
-                    "scope": {},
-                    "IP": "127.0.0.1",
-                    "exp": AGENT_CONFIG["TokenExpire"]
-                }
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Request_Invocation",
-                json=request_data,
-                timeout=30
-            )
-            result = response.json()
-            # 保存会话ID
-            if result.get("trace_info", {}).get("session_id"):
-                SESSION_CONFIG["session_id"] = result["trace_info"]["session_id"]
-        elif tool_name == "iam_list_api":
-            # 获取指定Bot的API列表
-            if not AGENT_CONFIG["AccessToken"]:
-                return {"error": "缺少有效的AccessToken，请先调用iam_apply_access_token申请令牌"}
-            request_data = {
-                "task_type": "list_api",
-                "query_bot": params["query_bot"],
-                "AccessToken": {
-                    "AgentID": AGENT_CONFIG["AgentID"],
-                    "AgentSecret": AGENT_CONFIG["AccessToken"],
-                    "IP": "127.0.0.1",
-                    "exp": AGENT_CONFIG["TokenExpire"]
-                },
-                "session_id": SESSION_CONFIG["session_id"]
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Request_Invocation",
-                json=request_data,
-                timeout=30
-            )
-            result = response.json()
-            # 更新会话ID
-            if result.get("trace_info", {}).get("session_id"):
-                SESSION_CONFIG["session_id"] = result["trace_info"]["session_id"]
-        elif tool_name == "iam_api_detail":
-            # 获取API详细信息
-            if not AGENT_CONFIG["AccessToken"]:
-                return {"error": "缺少有效的AccessToken，请先调用iam_apply_access_token申请令牌"}
-            request_data = {
-                "task_type": "api_detail",
-                "query_bot": params["query_bot"],
-                "API_ID": params["API_ID"],
-                "AccessToken": {
-                    "AgentID": AGENT_CONFIG["AgentID"],
-                    "AgentSecret": AGENT_CONFIG["AccessToken"],
-                    "IP": "127.0.0.1",
-                    "exp": AGENT_CONFIG["TokenExpire"]
-                },
-                "session_id": SESSION_CONFIG["session_id"],
-                "last_require": SESSION_CONFIG["last_require"]
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Request_Invocation",
-                json=request_data,
-                timeout=30
-            )
-            result = response.json()
-            # 更新会话信息
-            if result.get("trace_info", {}):
-                SESSION_CONFIG["session_id"] = result["trace_info"].get("session_id", SESSION_CONFIG["session_id"])
-                SESSION_CONFIG["last_require"] = result["trace_info"].get("require_id", "")
-        elif tool_name == "iam_invoke_api":
-            # 调用具体的工具API
-            if not AGENT_CONFIG["AccessToken"]:
-                return {"error": "缺少有效的AccessToken，请先调用iam_apply_access_token申请令牌"}
-            request_data = {
-                "task_type": "invoke",
-                "query_bot": params["query_bot"],
-                "API_ID": params["API_ID"],
-                "AccessToken": {
-                    "AgentID": AGENT_CONFIG["AgentID"],
-                    "AgentSecret": AGENT_CONFIG["AccessToken"],
-                    "IP": "127.0.0.1",
-                    "exp": AGENT_CONFIG["TokenExpire"]
-                },
-                "session_id": params.get("session_id", SESSION_CONFIG["session_id"]),
-                "last_require": SESSION_CONFIG["last_require"],
-                "Agent_data": params["Agent_data"],
-                "timeout": params.get("timeout", 30)
-            }
-            response = httpx.post(
-                "http://localhost:9000/IAMsystem/Request_Invocation",
-                json=request_data,
-                timeout=params.get("timeout", 30)
-            )
-            result = response.json()
-            # 更新会话信息
-            if result.get("trace_info", {}):
-                SESSION_CONFIG["session_id"] = result["trace_info"].get("session_id", SESSION_CONFIG["session_id"])
-                SESSION_CONFIG["last_require"] = result["trace_info"].get("require_id", "")
+            result = iam_apply_access_token(params.get("scope"), params.get("ttl", 3600))
+        elif tool_name == "call_indata_agent":
+            result = call_indata_agent(params["query_type"], params.get("query_params"))
+        elif tool_name == "call_external_search_agent":
+            result = call_external_search_agent(params["keyword"], params.get("search_params"))
         else:
             result = {"error": f"未知工具: {tool_name}"}
         
@@ -244,24 +333,7 @@ def call_tool(tool_name: str, params: Dict) -> Dict:
     except Exception as e:
         return {"error": str(e)}
 
-# 配置文件路径
-STORAGE_DIR = os.path.join(project_root, "Storage")
-REG_INFO_FILE = os.path.join(STORAGE_DIR, "IMA_reg_info.json")
-ACCESS_TOKENS_FILE = os.path.join(STORAGE_DIR, "AccessTokens.json")
 
-# 全局存储：AgentSecret和AccessToken，避免重复申请
-AGENT_CONFIG = {
-    "AgentID": CONFIG["name"],
-    "AgentSecret": "",
-    "AccessToken": "",
-    "TokenExpire": 0
-}
-
-# 全局会话存储
-SESSION_CONFIG = {
-    "session_id": "",
-    "last_require": ""
-}
 
 # 工具定义 - 所有可用工具
 TOOLS = [
@@ -299,91 +371,30 @@ TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "iam_apply_access_token",
-            "description": "调用IAM系统委托授权API，申请AccessToken，用于访问其他需要权限的API。需要先完成身份注册后才能调用。",
+            "name": "call_indata_agent",
+            "description": "调用企业数据Agent获取内部企业数据，包括通讯录、日历、多维表格等信息。当需要查询企业内部数据时使用，比如查询员工信息、会议安排、表格数据等。",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "AgentID": {"type": "string", "description": "已注册的AgentID，默认值为Lark-doc-Agent"},
-                    "Subtype": {"type": "string", "description": "身份类型，可选user/visitor/bot，默认值为user"},
-                    "AgentSecret": {"type": "string", "description": "注册时获得的AgentSecret，需要用户提前配置"},
-                    "purpose": {"type": "string", "description": "申请Token的用途，默认值为访问系统API"},
-                    "scope": {"type": "object", "description": "申请的权限范围，格式为{\"数据类型\": [\"操作列表\"]}"},
-                    "time": {"type": "integer", "description": "有效期，单位秒，最大86400，默认3600"}
+                    "query_type": {"type": "string", "description": "查询类型，可选值：read_contact(查询通讯录)、read_calendar(查询日历)、read_bitable(查询多维表格)"},
+                    "query_params": {"type": "object", "description": "查询参数，根据不同查询类型传入对应的参数，比如查询通讯录传入{\"name\": \"张三\"}，查询表格传入{\"table_id\": \"xxx\"}"}
                 },
-                "required": ["AgentSecret", "scope"]
+                "required": ["query_type"]
             }
         }
     },
     {
         "type": "function",
         "function": {
-            "name": "iam_register_agent",
-            "description": "调用IAM系统身份注册API，注册本Agent到IAM系统，获得AgentSecret，是使用其他IAM API的前提。只需要注册一次即可。",
+            "name": "call_external_search_agent",
+            "description": "调用外部检索Agent获取公开网络信息，支持网页搜索、内容抓取等。当需要查询最新的公开信息、行业动态、新闻资讯、知识百科等外部内容时使用。",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "AgentID": {"type": "string", "description": "Agent名称，固定为Lark-doc-Agent"},
-                    "Subtype": {"type": "string", "description": "身份类型，固定为bot"},
-                    "scope": {"type": "object", "description": "申请的权限范围，比如{\"doc\": [\"all\"], \"online\": [\"all\"]}"},
-                    "ip": {"type": "string", "description": "注册IP，默认127.0.0.1"}
+                    "keyword": {"type": "string", "description": "搜索关键词，描述你要查找的内容"},
+                    "search_params": {"type": "object", "description": "搜索参数，可选，比如{\"num\": 10, \"time_range\": \"month\"}指定返回结果数量和时间范围"}
                 },
-                "required": ["scope"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "iam_list_tools",
-            "description": "调用IAM系统Help接口，获取所有已注册的可用工具Bot列表，返回每个Bot的名称和功能描述。当你不知道有哪些工具可以使用时调用。",
-            "parameters": {"type": "object", "properties": {}}
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "iam_list_api",
-            "description": "调用IAM系统Help接口，获取指定工具Bot下的所有API列表，返回API ID、功能描述和所需权限。知道Bot名称后调用此接口查看该工具提供哪些API。",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query_bot": {"type": "string", "description": "要查询的Bot名称，比如Agent_indata/External-Search-Agent"}
-                },
-                "required": ["query_bot"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "iam_api_detail",
-            "description": "调用IAM系统Help接口，获取指定API的详细信息，包括请求参数格式、响应格式、所需权限。知道Bot和API ID后调用此接口查看如何使用该API。",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query_bot": {"type": "string", "description": "Bot名称，比如Agent_indata"},
-                    "API_ID": {"type": "string", "description": "API ID，从iam_list_api返回结果中获取"}
-                },
-                "required": ["query_bot", "API_ID"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "iam_invoke_api",
-            "description": "调用IAM系统统一请求接口，执行具体的工具API调用。获取API详情并确认参数格式后，调用此接口执行实际操作。",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query_bot": {"type": "string", "description": "目标Bot名称"},
-                    "API_ID": {"type": "string", "description": "要调用的API ID"},
-                    "Agent_data": {"type": "object", "description": "具体的请求参数，根据API详情中的required_json格式传入"},
-                    "session_id": {"type": "string", "description": "会话ID，可选，首次调用不需要传，后续调用复用返回的session_id"},
-                    "timeout": {"type": "integer", "description": "超时时间，单位秒，默认30"}
-                },
-                "required": ["query_bot", "API_ID", "Agent_data"]
+                "required": ["keyword"]
             }
         }
     }
@@ -463,78 +474,7 @@ def create_feishu_doc(title: str, content: str) -> dict:
     doc_data = data["data"]["document"]
     return {"doc_id": doc_data["document_id"], "doc_url": doc_data["url"], "local_path": local_filepath}
 
-# 8. 将注册到IMA系统中的身份保存到本地文件
-def save_user_info(user_info: dict) -> bool:
-    """
-    功能：将注册到IMA系统中的user身份保存到本地文件
-    以特定格式 添加到 相对于项目根目录的 Storage/IMA_reg_info.json 文件中
-    
-    :param user_info: 包含user身份信息的字典
-    包含字段示例：
-        "AgentID":"Lark-doc-Agent",
-        "Subtype":"user",
-        "scope":{"doc":["all"] , "tablebase":["all"] , "calendar":["all"] , "online":["all"]},
-        "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU (密钥算法自定义)",
-        "registered_at":1745800000,
-        "ip": "127.0.0.1"
-    """
-    # 检查文件是否存在
-    if not os.path.exists(f"{project_root}/Storage/IMA_reg_info.json"):
-        os.makedirs(f"{project_root}/Storage", exist_ok=True)
-    # 写入新user_info
-    with open(f"{project_root}/Storage/IMA_reg_info.json", "r+", encoding="utf-8") as f:
-        data = json.load(f)
-        data[user_info['AgentID']] = user_info
-        f.seek(0)
-        json.dump(data, f, ensure_ascii=False, indent=4)
-    return True
 
-# 9. 将申请的AccessTokenSecret保存到本地文件
-def save_access_token(access_token: dict) -> bool:
-    """
-    功能：将申请的AccessTokenSecret保存到本地文件
-    以特定格式 保存到 相对于项目根目录的 Storage/AccessTokens.json 文件中
-    
-    :param access_token: 包含申请的AccessTokenSecret的字典
-    包含字段示例：
-        "tk_f3449be846bc42c6b734a3e750cd46a2": {
-        "token_id": "tk_f3449be846bc42c6b734a3e750cd46a2",
-        "AgentID": "Lark-doc-Agent",
-        "Subtype": "user",
-        "scope": {
-            "online": [
-                "all"
-            ]
-        },
-        "AgentSecret": "47058a448425430cb678f47883d315d586cc053e",
-        "iat": 1777364339,
-        "exp": 1777367339,
-        "IP": "127.0.0.1",
-        "purpose": "获取企业数据"
-        }
-    """
-    # 检查文件是否存在
-    if not os.path.exists(f"{project_root}/Storage/AccessTokens.json"):
-        os.makedirs(f"{project_root}/Storage", exist_ok=True)
-    # 删除 原文件中 exp 已经过期的内容
-    tokens= None
-    with open(f"{project_root}/Storage/AccessTokens.json", "r", encoding="utf-8") as f:
-        current_time = int(time.time())
-        tokens = json.load(f)
-        # 遍历字典的key，删除过期的token
-        expired_token_ids = []
-        for token_id, token_info in tokens.items():
-            if token_info['exp'] != -1 and token_info["exp"] < current_time:
-                expired_token_ids.append(token_id)
-        # 批量删除过期token
-        for token_id in expired_token_ids:
-            del tokens[token_id]
-    # 新token以token_id作为key存入字典
-    tokens[access_token["token_id"]] = access_token
-    # 写入新token
-    with open(f"{project_root}/Storage/AccessTokens.json", "w", encoding="utf-8") as f:
-        json.dump(tokens, f, ensure_ascii=False, indent=4)
-    return True
 
 
 def test_5():
@@ -552,40 +492,13 @@ hello world!
 """)
     print(doc_list)
 
-def test_8():
-    use_info={
-        "AgentID":"test",
-        "Subtype":"visitor",
-        "scope":{"doc":["all"]},
-        "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU",
-        "registered_at":1745800000,
-        "ip": "127.0.0.1"
-    }
-    print(save_user_info(use_info))
 
-def test_9():
-    access_token={
-        "token_id": "tk_f3",
-        "AgentID": "Lark-doc-Agent",
-        "Subtype": "user",
-        "scope": {
-            "online": [
-                "all"
-            ]
-        },
-        "AgentSecret": "47058a448425430cb678f47883d315d586cc053e",
-        "iat": 1777364339,
-        "exp": 1777367339,
-        "IP": "127.0.0.1",
-        "purpose": "获取企业数据"
-    }
-    print(save_access_token(access_token))
 
 
 
 
 if __name__ == "__main__":
-    test_9()
+    pass
     
     
     

@@ -1,7 +1,7 @@
 # 服务配置
 AGENT_CONFIG = {
     "name": "Lark-doc-Agent",
-    "port": 9100,
+    "port": 9101,
     "host": "0.0.0.0"
 }
 

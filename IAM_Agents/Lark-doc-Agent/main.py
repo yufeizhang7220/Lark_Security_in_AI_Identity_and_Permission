@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 # 导入配置和SKILLS
 from config import AGENT_CONFIG, LLM_CONFIG, DOCS_DIR, LOG_DIR, WEBPAGES_DIR
 import SKILLS
-from SKILLS import TOOLS, call_tool, AGENT_CONFIG as SKILLS_AGENT_CONFIG, SESSION_CONFIG as SKILLS_SESSION_CONFIG
+from SKILLS import TOOLS, call_tool, AGENT_CONFIG as SKILLS_AGENT_CONFIG
 
 app = FastAPI(title="Lark-doc-Agent", version="1.0")
 
@@ -47,8 +47,6 @@ ensure_log_dirs()
 # 请求模型
 class DocGenerateRequest(BaseModel):
     title: str
-    use_data: bool
-    use_online: bool
     user_input: str
 
 # 日志工具函数
@@ -65,7 +63,7 @@ def write_user_log(
     """写入用户输入日志，出错不影响主流程"""
     try:
         ensure_log_dirs()
-        log_path = os.path.join(LOG_DIR_ABS, "user_about")
+        log_path = os.path.join(LOG_DIR_ABS, "user_about.log")
         log_line = f"[{time_str}] [{title}] [{user_input}] [{','.join(required_tools)}] [{','.join(used_tools)}] [{result}] [{local_path}] [{doc_url}]\n"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(log_line)
@@ -76,7 +74,7 @@ def write_skill_log(time_str: str, skill_list: List[str]):
     """写入skill使用日志，出错不影响主流程"""
     try:
         ensure_log_dirs()
-        log_path = os.path.join(LOG_DIR_ABS, "skills_about")
+        log_path = os.path.join(LOG_DIR_ABS, "skills_about.log")
         log_line = f"[{time_str}] [{','.join(skill_list)}]\n"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(log_line)
@@ -87,12 +85,14 @@ def write_iam_log(time_str: str, api: str, request_json: Dict, response_json: Di
     """写入IAM系统调度日志，出错不影响主流程"""
     try:
         ensure_log_dirs()
-        log_path = os.path.join(LOG_DIR_ABS, "IAM_about")
+        log_path = os.path.join(LOG_DIR_ABS, "IAM_about.log")
         log_line = f"[{time_str}] [{api}] [{json.dumps(request_json, ensure_ascii=False)}] [{json.dumps(response_json, ensure_ascii=False)}]\n"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(log_line)
     except:
         pass
+
+
 
 # LLM调用函数，支持工具调用
 def call_llm_with_tools(messages: List[Dict]) -> Dict:
@@ -142,29 +142,20 @@ async def generate_doc(request: DocGenerateRequest):
         logs.append(f"🚀 启动飞书文档助手Agent")
         logs.append(f"📝 文档标题: {request.title}")
         logs.append(f"💡 用户需求: {request.user_input}")
-        logs.append(f"⚙️  配置：使用飞书数据={request.use_data}, 使用外部检索={request.use_online}")
+
 
         # 1. 系统提示词，告诉LLM身份和能力
         system_prompt = f"""你是飞书文档助手Agent，专业的文档生成专家。
 你的核心能力：
 1. 自主判断用户需求，生成高质量的专业文档
 2. 可以自主选择调用工具完成任务，不需要询问用户
-3. 可以通过IAM系统的Help接口自主发现所有可用的工具API，不需要预定义
+3. 支持访问企业内部数据和外部公开信息，自动整合多来源内容
 4. 最后直接返回完整的文档内容即可，不需要调用create_feishu_doc工具，系统会自动为你创建飞书文档
 
 工具使用规则：
-- **强制要求：每个任务开始时必须首先调用iam_list_tools获取IAM系统中所有已注册的可用工具列表，了解有哪些能力可以使用**
-- 获取工具列表后，根据用户需求判断是否需要调用相关工具，有合适的工具优先使用工具获取信息
-- 选择合适的工具Bot后，调用iam_list_api查看该Bot提供的所有API列表
-- 选择合适的API后，调用iam_api_detail获取该API的详细参数格式和使用方法
-- 确认参数格式后，调用iam_invoke_api执行实际的API调用，获取返回结果
-- 需要获取企业内部数据时，优先通过IAM系统调用Agent_indata
-- 需要外部公开信息时，优先通过IAM系统调用External-Search-Agent
-- **IAM错误处理规则：遇到IAM相关错误时优先尝试解决，不要直接跳过**
-  - 提示"缺少有效的AccessToken" → 调用iam_apply_access_token申请令牌
-  - 提示"未注册" → 调用iam_register_agent完成身份注册
-  - 提示"权限不足" → 检查权限范围，重新申请包含对应权限的AccessToken
-  - 只有尝试解决失败3次以上或遇到不可恢复的系统错误时，再基于已有知识生成文档
+- 根据用户需求判断是否需要调用相关工具，有合适的工具优先使用工具获取信息
+- 需要查询企业内部数据（通讯录、日历、多维表格等）时，优先调用call_indata_agent工具
+- 需要查询公开网络信息（新闻、资讯、知识、行业动态等）时，优先调用call_external_search_agent工具
 - 所有工具调用结果都要整合到最终的文档内容中
 - 必须确保内容丰富、结构清晰，符合企业文档规范
 - 最后直接返回完整的文档内容即可，不需要调用create_feishu_doc工具，系统会自动为你创建飞书文档。"""
@@ -206,18 +197,11 @@ async def generate_doc(request: DocGenerateRequest):
                     tool_result = call_tool(tool_name, tool_params)
                     used_tools.append(tool_name)
                     
-                    # 处理IAM调用结果
-                    if tool_name.startswith("iam_") and ("error" in tool_result or tool_result.get("code") not in [0, 200, 601]):
-                        error_msg = tool_result.get("error", str(tool_result))
-                        logs.append(f"🔧 IAM工具 {tool_name} 调用失败: {error_msg}，请尝试解决问题后重试")
-                        # 给LLM返回错误信息，让它根据错误类型选择对应的解决工具
-                        tool_result["hint"] = f"IAM调用失败，错误原因: {error_msg}。请根据错误类型调用对应的解决工具：缺少Token调用iam_apply_access_token，未注册调用iam_register_agent，权限不足重新申请对应权限的AccessToken。"
-                    else:
-                        logs.append(f"🔧 工具执行结果: {json.dumps(tool_result, ensure_ascii=False)}")
+
                     
-                    # 记录IAM调用日志
-                    if tool_name.startswith("iam_"):
-                        write_iam_log(time_str, tool_name, tool_params, tool_result)
+                    logs.append(f"🔧 工具执行结果: {json.dumps(tool_result, ensure_ascii=False)}")
+                    
+
                     
                     # 把工具结果返回给LLM
                     messages.append({
@@ -264,7 +248,7 @@ async def generate_doc(request: DocGenerateRequest):
                 time_str=time_str,
                 title=request.title,
                 user_input=request.user_input,
-                required_tools=["飞书数据" if request.use_data else "", "外部检索" if request.use_online else ""],
+                required_tools=[],
                 used_tools=used_tools,
                 result="创建失败",
                 local_path="",
@@ -284,10 +268,6 @@ async def generate_doc(request: DocGenerateRequest):
 
         # 5. 记录日志
         required_tools = []
-        if request.use_data:
-            required_tools.append("飞书数据")
-        if request.use_online:
-            required_tools.append("外部检索")
         
         write_user_log(
             time_str=time_str,
@@ -323,7 +303,7 @@ async def generate_doc(request: DocGenerateRequest):
             time_str=time_str,
             title=request.title,
             user_input=request.user_input,
-            required_tools=["飞书数据" if request.use_data else "", "外部检索" if request.use_online else ""],
+            required_tools=[],
             used_tools=used_tools,
             result="处理失败",
             local_path="",

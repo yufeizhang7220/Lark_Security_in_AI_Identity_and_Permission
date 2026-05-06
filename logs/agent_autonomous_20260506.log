@@ -1,0 +1,8 @@
+2026-05-06 22:43:45,828 - INFO - User query: {"table_name": "成绩单"}
+2026-05-06 22:44:06,607 - INFO - Step 1 - Skill selection response: {"read_skills": ["SKILL.md", "references/lark-doc-create.md"]}
+2026-05-06 22:44:13,859 - INFO - Step 2 - Command construction: {"command": ["lark-cli", "drive", "+search", "--query", "成绩单", "--format", "json", "--as", "user"]}
+2026-05-06 22:44:13,860 - INFO - TOOL_CHAIN: {"task_type": "autonomous", "tool_chain": ["execute: lark-cli drive +search --query 成绩单 --format json --as user"], "context": {"task_type": "query_data", "Agent_data": {"query_type": "read_bitable", "query_data": {"table_name": "成绩单"}}}, "timestamp": "2026-05-06T22:44:13.859719"}
+2026-05-06 22:44:25,986 - INFO - User query: {"query_content": "获取所有成绩单相关的学生成绩数据"}
+2026-05-06 22:44:46,075 - INFO - Step 1 - Skill selection response: {"read_skills": ["SKILL.md", "references/lark-doc-search.md", "references/lark-doc-fetch.md"]}
+2026-05-06 22:45:04,381 - INFO - Step 2 - Command construction: {"command": ["lark-cli", "drive", "+search", "--query", "成绩单 学生成绩数据", "--filter", "{\"doc_types\":[\"SHEET\"]}", "--format", "json", "--as", "user"]}
+2026-05-06 22:45:04,381 - INFO - TOOL_CHAIN: {"task_type": "autonomous", "tool_chain": ["execute: lark-cli drive +search --query 成绩单 学生成绩数据 --filter {\"doc_types\":[\"SHEET\"]} --format json --as user"], "context": {"task_type": "query_data", "Agent_data": {"query_type": "read_bitable", "query_data": {"query_content": "获取所有成绩单相关的学生成绩数据"}}}, "timestamp": "2026-05-06T22:45:04.381518"}

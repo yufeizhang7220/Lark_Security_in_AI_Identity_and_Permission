@@ -358,3 +358,34 @@ for i in range(1, 10):
 
 你可以点击链接在线查看完整的成绩分析内容，也可以打开本地路径访问源Markdown文件。
 2026-04-26 20:50:16,603 - Lark-doc-Agent - INFO - 返回结果: {'success': True, 'status': 'success', 'data': {'response': '我已经根据成绩表数据完成了学生成绩情况分析，并成功创建了对应飞书文档，相关信息如下：\n- 文档标题：成绩查询\n- 在线访问地址：<a href=https://jcneyh7qlo8i.feishu.cn/docx/QLgcdbH6Zo9KI4xWrFRcDr2enfc target=_blank>https://jcneyh7qlo8i.feishu.cn/docx/QLgcdbH6Zo9KI4xWrFRcDr2enfc</a>\n- 本地存储路径：E:\\CODE\\AI_Lark\\Lark_Security_in_AI_Identity_and_Permission\\Agents\\Lark-doc-Agent\\resource\\docs\\成绩查询_564705.md\n\n你可以点击链接在线查看完整的成绩分析内容，也可以打开本地路径访问源Markdown文件。'}}
+2026-05-06 14:50:31,809 - 统一Agent服务 - INFO - ============================================================
+2026-05-06 14:50:31,813 - 统一Agent服务 - INFO - 统一Agent服务初始化
+2026-05-06 14:50:31,813 - 统一Agent服务 - INFO - ============================================================
+2026-05-06 14:50:31,851 - 统一Agent服务 - INFO - ============================================================
+2026-05-06 14:50:31,851 - 统一Agent服务 - INFO - 启动统一Agent服务
+2026-05-06 14:50:31,851 - 统一Agent服务 - INFO - API地址: http://0.0.0.0:8787
+2026-05-06 14:50:31,851 - 统一Agent服务 - INFO - 可用Agent:
+2026-05-06 14:50:31,851 - 统一Agent服务 - INFO -   - Agent_indata: 企业数据Agent (负责查询企业内部数据（通讯录、日历、多维表格等）)
+2026-05-06 14:50:31,852 - 统一Agent服务 - INFO -   - Lark-doc-Agent: 飞书文档助手 (负责创建和修改飞书文档，可调用其他Agent获取信息)
+2026-05-06 14:50:31,852 - 统一Agent服务 - INFO -   - External-Search-Agent: 外部检索Agent (负责从外部公开网站获取信息，无权访问飞书企业内部数据)
+2026-05-06 14:50:31,852 - 统一Agent服务 - INFO - ============================================================
+2026-05-06 14:52:56,489 - 统一Agent服务 - INFO - 收到 External-Search-Agent 请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': '不同场景适用的生日祝福语 同事 朋友 家人通用暖心生日祝福文案', 'search_params': {'num': 20, 'time_range': 'all'}}}
+2026-05-06 14:52:56,497 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': '不同场景适用的生日祝福语 同事 朋友 家人通用暖心生日祝福文案', 'search_params': {'num': 20, 'time_range': 'all'}}}
+2026-05-06 14:52:56,500 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-05-06 14:52:56,503 - External-Search-Agent - INFO - 操作类型: , 查询数据: {}
+2026-05-06 14:52:56,504 - External-Search-Agent - INFO - 返回结果: {'success': False, 'error': '未知操作: '}
+2026-05-06 14:57:25,079 - 统一Agent服务 - INFO - 收到 External-Search-Agent 请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': 'SQL注入 定义 原理 危害 常见类型 防护方法 企业实战案例', 'search_params': {'num': 10, 'time_range': 'year'}}}
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': 'SQL注入 定义 原理 危害 常见类型 防护方法 企业实战案例', 'search_params': {'num': 10, 'time_range': 'year'}}}
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 操作类型: , 查询数据: {}
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 返回结果: {'success': False, 'error': '未知操作: '}
+2026-05-06 15:08:53,282 - 统一Agent服务 - INFO - 收到 Agent_indata 请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'query_data', 'Agent_data': {'query_type': 'read_bitable', 'query_data': {'table_name': '2024年春季学期学生期末考试成绩单', 'need_all_data': True}}}
+2026-05-06 15:08:53,283 - Agent_indata - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'query_data', 'Agent_data': {'query_type': 'read_bitable', 'query_data': {'table_name': '2024年春季学期学生期末考试成绩单', 'need_all_data': True}}}
+2026-05-06 15:08:53,320 - Agent_indata - INFO - 处理 Agent_indata 请求
+2026-05-06 15:08:53,320 - Agent_indata - INFO - 任务类型: query_data, 查询类型: read_bitable, 输出类型: json
+2026-05-06 15:08:53,321 - Agent_indata - INFO - 返回结果: {'success': True, 'Agent_id': 'Agent_indata', 'session_id': 'session_5330215368872045655', 'session_datetime': '2024-01-01T00:00:00Z', 'context': {'task_type': 'query_data', 'priority': 'user', 'Agent_data': {'query_type': 'read_bitable', 'output_type': 'json', 'query_data': {'table': [{'姓名': '张三', '成绩': '90', '班级': 'A班'}, {'姓名': '李四', '成绩': '85', '班级': 'A班'}, {'姓名': '王五', '成绩': '88', '班级': 'A班'}]}}}}
+2026-05-06 15:14:51,084 - 统一Agent服务 - INFO - 收到 Agent_indata 请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'query_data', 'Agent_data': {'query_type': 'read_bitable', 'query_data': {'table_name': '2024年秋季学期学生期末成绩单', 'required_fields': ['学生姓名', '所属班级', '语文分数', '数学分数', '英语分数', '综合科目分数', '总分', '年级排名', '不及格科目', '较上学期分数变动']}}}
+2026-05-06 15:14:51,085 - Agent_indata - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'query_data', 'Agent_data': {'query_type': 'read_bitable', 'query_data': {'table_name': '2024年秋季学期学生期末成绩单', 'required_fields': ['学生姓名', '所属班级', '语文分数', '数学分数', '英语分数', '综合科目分数', '总分', '年级排名', '不及格科目', '较上学期分数变动']}}}
+2026-05-06 15:14:51,085 - Agent_indata - INFO - 处理 Agent_indata 请求
+2026-05-06 15:14:51,085 - Agent_indata - INFO - 任务类型: query_data, 查询类型: read_bitable, 输出类型: json
+2026-05-06 15:14:51,085 - Agent_indata - INFO - 返回结果: {'success': True, 'Agent_id': 'Agent_indata', 'session_id': 'session_-5440020297101630815', 'session_datetime': '2024-01-01T00:00:00Z', 'context': {'task_type': 'query_data', 'priority': 'user', 'Agent_data': {'query_type': 'read_bitable', 'output_type': 'json', 'query_data': {'table': [{'姓名': '张三', '成绩': '90', '班级': 'A班'}, {'姓名': '李四', '成绩': '85', '班级': 'A班'}, {'姓名': '王五', '成绩': '88', '班级': 'A班'}]}}}}
