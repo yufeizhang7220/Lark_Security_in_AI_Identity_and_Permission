@@ -18,6 +18,7 @@ USERS_JSON_PATH = os.path.join(STORAGE_DIR, "users.json")
 BOTS_JSON_PATH = os.path.join(STORAGE_DIR, "bots.json")
 TOKEN_BLACKLIST_PATH = os.path.join(STORAGE_DIR, "token_blacklist.json")
 BLACKLIST_PATH = os.path.join(STORAGE_DIR, "blacklist.json") # 全局黑名单路径
+TOKEN_CONFIG_PATH = os.path.join(STORAGE_DIR, "token_config.json") # Token配置路径
 
 # 日志路径配置
 APPLY_TOKEN_LOG_DIR = os.path.join(LOGS_BASE_DIR, "Apply_Token")

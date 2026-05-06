@@ -26,3 +26,15 @@
 2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
 2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 操作类型: web_search, 查询数据: {'query': '明天的天气情况', 'num_results': 3}
 2026-04-26 20:48:00,745 - External-Search-Agent - INFO - 返回结果: {'success': True, 'results': [{'title': '搜索结果 1 for 明天的天气情况', 'url': 'https://example.com/result1', 'snippet': "这是关于 '明天的天气情况' 的第 1 条搜索结果摘要"}, {'title': '搜索结果 2 for 明天的天气情况', 'url': 'https://example.com/result2', 'snippet': "这是关于 '明天的天气情况' 的第 2 条搜索结果摘要"}, {'title': '搜索结果 3 for 明天的天气情况', 'url': 'https://example.com/result3', 'snippet': "这是关于 '明天的天气情况' 的第 3 条搜索结果摘要"}], 'total': 3, 'query': '明天的天气情况'}
+2026-05-06 14:52:56,497 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': '不同场景适用的生日祝福语 同事 朋友 家人通用暖心生日祝福文案', 'search_params': {'num': 20, 'time_range': 'all'}}}
+2026-05-06 14:52:56,500 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-05-06 14:52:56,503 - External-Search-Agent - INFO - 操作类型: , 查询数据: {}
+2026-05-06 14:52:56,504 - External-Search-Agent - INFO - 返回结果: {'success': False, 'error': '未知操作: '}
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': 'SQL注入 定义 原理 危害 常见类型 防护方法 企业实战案例', 'search_params': {'num': 10, 'time_range': 'year'}}}
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 接收请求: user_input=None Agent_id=None session_id=None session_datetime=None context={'task_type': 'web_search', 'Agent_data': {'keyword': 'SQL注入 定义 原理 危害 常见类型 防护方法 企业实战案例', 'search_params': {'num': 10, 'time_range': 'year'}}}
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-05-06 14:57:25,081 - External-Search-Agent - INFO - 处理 External-Search-Agent 请求
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 操作类型: , 查询数据: {}
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 操作类型: , 查询数据: {}
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 返回结果: {'success': False, 'error': '未知操作: '}
+2026-05-06 14:57:25,082 - External-Search-Agent - INFO - 返回结果: {'success': False, 'error': '未知操作: '}

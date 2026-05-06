@@ -1,10 +1,27 @@
-{    
-    "Lark-doc-Agent":{
-    "AgentID":"Lark-doc-Agent",
-    "Subtype":"user",
-    "scope":{"doc":["all"] , "tablebase":["all"] , "calendar":["all"] , "online":["all"]},
-    "AgentSecret":"7s9KpR2tG8xQbA5dF3zC1vN4mH6jY0wU",
-    "registered_at":1745800000,
-    "ip": "127.0.0.1"
+{
+    "Lark-doc-Agent": {
+        "Agent_name": "Lark-doc-Agent",
+        "subtype": "user",
+        "scope": {
+            "doc": [
+                "all"
+            ],
+            "indata": [
+                "read_contact",
+                "read_calendar",
+                "read_bitable"
+            ],
+            "online": [
+                "web_search",
+                "fetch_content"
+            ],
+            "iam": [
+                "apply_token",
+                "verify_token"
+            ]
+        },
+        "agent_id": "user_1778051322_c334d2e1",
+        "agent_secret": "8c9836a45b2f0965a528eeaa4cb09159",
+        "registered_at": 1778051324
     }
 }
