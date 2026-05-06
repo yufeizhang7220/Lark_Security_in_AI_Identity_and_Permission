@@ -40,7 +40,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 iam_client = IAMClient()
 
 # 企业数据Agent地址
-INDATA_AGENT_URL = "http://localhost:8000/api/query"  # 企业数据Agent默认地址，根据实际情况修改
+INDATA_AGENT_URL = "http://localhost:9300/Agent_indata/api/query"  # 企业数据Agent默认地址，根据实际情况修改
 
 # 初始化Agent实例
 agent = ExternalSearchAgent()

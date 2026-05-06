@@ -15,3 +15,5 @@
 [2026-05-06 20:11:31] [快乐星球] [什么是快乐星球] [] [call_external_search_agent,check_doc_create_permission,create_feishu_doc] [创建成功] [Local_docs\快乐星球_483943.md] [https://jcneyh7qlo8i.feishu.cn/docx/VtnGdFweVoFn06x3oNMcvMFQnbc]
 [2026-05-06 20:15:19] [快乐星球] [什么是快乐星球] [] [call_external_search_agent,call_external_search_agent,check_doc_create_permission,create_feishu_doc] [创建成功] [Local_docs\快乐星球_913985.md] [https://jcneyh7qlo8i.feishu.cn/docx/E2NKdbfNWop1DWxFVAGcAQCanXd]
 [2026-05-06 20:22:40] [快乐星球] [什么是快乐星球] [] [call_external_search_agent,check_doc_create_permission,create_feishu_doc] [创建成功] [Local_docs\快乐星球_66229.md] [https://jcneyh7qlo8i.feishu.cn/docx/XGKDdGKvpo4XXgxiKRQcAfyrnMd]
+[2026-05-06 22:43:16] [成绩单] [根据 成绩单 生成学生成绩分析报告] [] [call_indata_agent,call_indata_agent,check_doc_create_permission,create_feishu_doc] [创建成功] [Local_docs\成绩单_434264.md] [https://jcneyh7qlo8i.feishu.cn/docx/QKludmCPBoHY4jxh9JJcdRKdnoh]
+[2026-05-06 22:54:03] [成绩单] [根据 成绩单 生成学生成绩分析报告] [] [call_indata_agent,check_doc_create_permission,create_feishu_doc] [创建成功] [Local_docs\成绩单_446319.md] [https://jcneyh7qlo8i.feishu.cn/docx/Z1GrdZBUYo7OMpx4GixcUrvAnVh]

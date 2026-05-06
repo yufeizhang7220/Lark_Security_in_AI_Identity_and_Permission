@@ -1210,6 +1210,22 @@
       "ip": "127.0.0.1",
       "registered_at": 1778071403,
       "status": "active"
+    },
+    {
+      "agent_id": "user_1778079395_059777cf",
+      "agent_name": "visitor_rw8xa1ew",
+      "subtype": "visitor",
+      "agent_secret": "$2b$12$67ndWzxmlhkTlnBduuVKQu5DP2hWsLR/7Kq3GRsj3XHj8XHIOIpaq",
+      "scope": {
+        "online": [
+          "web_search",
+          "fetch_content",
+          "analyze_content"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1778079395,
+      "status": "active"
     }
   ]
 }

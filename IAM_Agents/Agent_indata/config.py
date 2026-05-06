@@ -6,21 +6,9 @@ LLM_CONFIG = {
 
 AGENT_ID = "Agent_indata"
 HOST = "localhost"
-PORT = 8787
-
-IAM_CONFIG = {
-    "identity_registration_url": "http://localhost:9002/IAMsystem/identity/register/bot",
-    "identity_verify_url": "http://localhost:9002/IAMsystem/identity/verify",
-    "auth_apply_token_url": "http://localhost:9001/IAMsystem/auth/apply-token",
-    "auth_verify_token_url": "http://localhost:9001/IAMsystem/auth/verify-token",
-    "auth_revoke_token_url": "http://localhost:9001/IAMsystem/auth/revoke-token",
-    "storage_dir": "Storage",
-    "reg_info_file": "Storage/IMA_reg_info.json",
-    "access_tokens_file": "Storage/AccessTokens.json"
-}
+PORT = 9300
 
 DEFAULT_BOT_SCOPE = {
     "indata": ["read_contact", "read_calendar", "read_bitable"],
-    "doc": ["read"],
-    "iam": ["verify_token"]
+    "doc": ["read"]
 }

@@ -238,7 +238,7 @@ def call_indata_agent(query_type: str, query_params: Dict = None) -> Dict:
         }
         
         response = httpx.post(
-            "http://localhost:8787/Agent_indata/api/query",
+            "http://localhost:9300/Agent_indata/api/query",
             json=request_data,
             headers=headers,
             timeout=30
