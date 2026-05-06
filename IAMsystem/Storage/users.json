@@ -1143,6 +1143,33 @@
       "ip": "127.0.0.1",
       "registered_at": 1777980356,
       "status": "active"
+    },
+    {
+      "agent_id": "user_1778051322_c334d2e1",
+      "agent_name": "Lark-doc-Agent",
+      "subtype": "user",
+      "agent_secret": "$2b$12$ZEkZNe284KcPag6ZB4pFR.D5uT.ElOv4Afe1WNaU90GdxId3VMkcW",
+      "scope": {
+        "doc": [
+          "all"
+        ],
+        "indata": [
+          "read_contact",
+          "read_calendar",
+          "read_bitable"
+        ],
+        "online": [
+          "web_search",
+          "fetch_content"
+        ],
+        "iam": [
+          "apply_token",
+          "verify_token"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1778051322,
+      "status": "active"
     }
   ]
 }
