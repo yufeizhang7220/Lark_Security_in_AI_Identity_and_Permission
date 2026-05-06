@@ -4,9 +4,9 @@
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from agents.external_search import ExternalSearchAgent
+from external_search.main import ExternalSearchAgent
 
 def test_iam_compatibility():
     """测试IAM兼容性"""

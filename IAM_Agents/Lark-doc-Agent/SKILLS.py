@@ -268,23 +268,32 @@ def call_external_search_agent(keyword: str, search_params: Dict = None) -> Dict
             "Content-Type": "application/json"
         }
         
+        search_params = search_params if search_params else {}
+        # 适配外部检索Agent标准接口格式
         request_data = {
-            "context": {
-                "task_type": "web_search",
-                "Agent_data": {
-                    "keyword": keyword,
-                    "search_params": search_params if search_params else {}
-                }
-            }
+            "action": "web_search",
+            "query": keyword,
+            "num_results": search_params.get("num_results", 5),
+            # 透传其他搜索参数
+            **{k: v for k, v in search_params.items() if k != "num_results"}
         }
         
         response = httpx.post(
-            "http://localhost:8787/External-Search-Agent/api/query",
+            "http://localhost:9200/External-Search-Agent/api/query",
             json=request_data,
             headers=headers,
             timeout=30
         )
         result = response.json()
+        
+        # 兼容原有返回格式，适配旧代码
+        if result.get("success") and "results" in result:
+            # 将结果格式转换为原有系统期望的格式
+            result["data"] = {
+                "search_results": result["results"],
+                "total": result.get("total", len(result["results"])),
+                "query": result.get("query", keyword)
+            }
         
         # 记录外部检索Agent调用日志
         from main import write_iam_log

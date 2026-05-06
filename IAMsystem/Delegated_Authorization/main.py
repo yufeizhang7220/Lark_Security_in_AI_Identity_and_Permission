@@ -114,6 +114,18 @@ async def apply_token(request: Request, req: ApplyTokenRequest):
         
         # 3. 计算权限交集：Agent自身权限 ∩ 申请权限
         agent_scope = agent.get("scope", {})
+        # visitor身份只能拥有和申请online相关权限，过滤其他权限
+        if agent.get("subtype") == "visitor":
+            # 过滤自身权限
+            filtered_scope = {}
+            if "online" in agent_scope:
+                filtered_scope["online"] = agent_scope["online"]
+            agent_scope = filtered_scope
+            # 过滤申请的权限
+            filtered_applied_scope = {}
+            if "online" in req.applied_scope:
+                filtered_applied_scope["online"] = req.applied_scope["online"]
+            req.applied_scope = filtered_applied_scope
         granted_scope = calculate_scope_intersection([agent_scope, req.applied_scope])
         
         # 4. 如果有委托链，还要和委托链中所有上层权限取交集

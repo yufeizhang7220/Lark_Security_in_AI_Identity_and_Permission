@@ -17,7 +17,9 @@
       "subtype": "user",
       "agent_secret": "$2b$12$jDnSrOHSp2mODwqF2on9seBzBPVfq6wWs5xZlHJwsYoklHo4rvCeW",
       "scope": {
-        "*": ["all"]
+        "*": [
+          "all"
+        ]
       },
       "ip": "127.0.0.1",
       "registered_at": 1745000000,
@@ -1182,6 +1184,31 @@
       },
       "ip": "127.0.0.1",
       "registered_at": 1778051322,
+      "status": "active"
+    },
+    {
+      "agent_id": "user_1778071403_6fbb5a67",
+      "agent_name": "visitor_fgoleqr7",
+      "subtype": "visitor",
+      "agent_secret": "$2b$12$6u4xoDKT96ESkjeB.IaN1eLa6gb3FVfGDkwjy5pgi9rV/31GC9PDm",
+      "scope": {
+        "online": [
+          "web_search",
+          "fetch_content",
+          "analyze_content"
+        ],
+        "indata": [
+          "read_contact",
+          "read_calendar",
+          "read_bitable"
+        ],
+        "iam": [
+          "apply_token",
+          "verify_token"
+        ]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1778071403,
       "status": "active"
     }
   ]
