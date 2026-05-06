@@ -12,6 +12,19 @@
   },
   "data": [
     {
+      "agent_id": "admin",
+      "agent_name": "系统管理员",
+      "subtype": "user",
+      "agent_secret": "$2b$12$jDnSrOHSp2mODwqF2on9seBzBPVfq6wWs5xZlHJwsYoklHo4rvCeW",
+      "scope": {
+        "*": ["all"]
+      },
+      "ip": "127.0.0.1",
+      "registered_at": 1745000000,
+      "status": "active",
+      "is_admin": true
+    },
+    {
       "agent_id": "user_001",
       "agent_name": "张三",
       "subtype": "user",

@@ -52,6 +52,8 @@ Authorization: Bearer {AccessToken字符串}
 | `/apply-token` | POST | 申请AccessToken | 是（需传入agent_id和agent_secret） |
 | `/verify-token` | POST | 校验AccessToken合法性 | 是（需传入调用方bot_id和agent_secret） |
 | `/revoke-token` | POST | 撤销已签发的AccessToken | 是（需传入agent_id和agent_secret） |
+| `/token-config` | GET | 获取Token全局配置 | 否 |
+| `/update-token-config` | POST | 更新Token全局配置 | 是（仅管理员可调用） |
 | `/health` | GET | 健康检查接口 | 否 |
 
 ---
@@ -104,7 +106,7 @@ Authorization: Bearer {AccessToken字符串}
 |------|------|------|
 | `access_token` | string | JWT格式的AccessToken |
 | `accesstoken_type` | string | Token类型：dynamic/static |
-| `expire_at` | int | Token过期时间戳，静态Token为null |
+| `expire_at` | int | Token过期时间戳 |
 | `granted_scope` | object | 实际授予的权限范围 |
 
 #### curl调用示例
@@ -234,7 +236,92 @@ curl -X POST "http://localhost:9001/IAMsystem/auth/revoke-token" \
 
 ---
 
-### 4. 健康检查接口
+### 4. 获取Token全局配置
+#### 接口说明
+获取当前Token授权的全局配置，包括全局模式、有效期设置等，供前端页面展示使用。
+
+#### 请求示例
+```bash
+curl "http://localhost:9001/IAMsystem/auth/token-config"
+```
+
+#### 响应示例
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "global_token_mode": "dynamic",
+    "allow_custom_mode": true,
+    "static_token_max_ttl": 2592000,
+    "dynamic_token_max_ttl": 86400
+  }
+}
+```
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `global_token_mode` | string | 全局授权模式：`dynamic`(全局动态)/`static`(全局静态)/`custom`(自定义) |
+| `allow_custom_mode` | boolean | 是否允许用户申请时自定义Token类型，仅custom模式下生效 |
+| `static_token_max_ttl` | int | 静态Token最长有效期，单位秒，默认30天(2592000秒) |
+| `dynamic_token_max_ttl` | int | 动态Token最长有效期，单位秒，默认24小时(86400秒) |
+
+---
+
+### 5. 更新Token全局配置
+#### 接口说明
+修改Token授权的全局配置，仅管理员账号可调用，修改后立即生效。
+
+#### 请求参数
+```json
+{
+  "agent_id": "admin",
+  "agent_secret": "123456",
+  "global_token_mode": "custom",
+  "allow_custom_mode": true,
+  "static_token_max_ttl": 2592000,
+  "dynamic_token_max_ttl": 86400
+}
+```
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `agent_id` | string | 是 | 管理员AgentID，需要有`is_admin: true`标识 |
+| `agent_secret` | string | 是 | 管理员密钥 |
+| `global_token_mode` | string | 是 | 全局授权模式：dynamic/static/custom |
+| `allow_custom_mode` | boolean | 是 | 是否允许用户自定义Token类型 |
+| `static_token_max_ttl` | int | 是 | 静态Token最长有效期，单位秒，范围：3600(1小时) ~ 31536000(1年) |
+| `dynamic_token_max_ttl` | int | 是 | 动态Token最长有效期，单位秒，范围：300(5分钟) ~ 86400(24小时) |
+
+#### 响应示例
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "global_token_mode": "custom",
+    "allow_custom_mode": true,
+    "static_token_max_ttl": 2592000,
+    "dynamic_token_max_ttl": 86400
+  }
+}
+```
+
+#### curl调用示例
+```bash
+curl -X POST "http://localhost:9001/IAMsystem/auth/update-token-config" \
+-H "Content-Type: application/json" \
+-d '{
+  "agent_id": "admin",
+  "agent_secret": "123456",
+  "global_token_mode": "custom",
+  "allow_custom_mode": true,
+  "static_token_max_ttl": 2592000,
+  "dynamic_token_max_ttl": 86400
+}'
+```
+
+---
+
+### 6. 健康检查接口
 #### 接口说明
 检查服务是否正常运行。
 
@@ -306,13 +393,21 @@ curl "http://localhost:9001/IAMsystem/auth/health"
 | `online` | 外部网络访问权限 |
 | `iam` | IAM系统自身操作权限 |
 
-### 3. Token类型说明
+### 3. 全局授权模式说明
+系统支持三种全局授权模式，可通过`/update-token-config`接口修改：
+| 模式 | 说明 |
+|------|------|
+| `dynamic` | 全局动态模式：所有申请的Token自动为动态类型，忽略请求中的token_type参数 |
+| `static` | 全局静态模式：所有申请的Token自动为静态类型，忽略请求中的token_type参数 |
+| `custom` | 自定义模式：允许用户申请时通过token_type参数指定Token类型 |
+
+### 4. Token类型说明
 | 类型 | 说明 | 适用场景 |
 |------|------|---------|
-| `dynamic` | 动态Token | 默认类型，有有效期限制，绑定申请时的IP地址，安全性高 |
-| `static` | 静态Token | 无过期时间，不受IP限制，仅用于可信的内部服务调用 |
+| `dynamic` | 动态Token | 默认类型，绑定申请时的IP地址，使用时IP必须匹配，有效期最长24小时（可配置），安全性高 |
+| `static` | 静态Token | 不绑定IP地址，任意IP均可使用，有效期最长30天（可配置），适用于可信的内部服务调用、长期集成场景 |
 
-### 4. 快速启动服务
+### 5. 快速启动服务
 ```bash
 # 安装依赖
 pip install -r requirements.txt

@@ -1,13 +1,13 @@
 {
     "user_1778051322_c334d2e1": {
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJJQU0tU3lzdGVtIiwiQWdlbnRJRCI6InVzZXJfMTc3ODA1MTMyMl9jMzM0ZDJlMSIsImlhdCI6MTc3ODA1MTMyOSwianRpIjoiZDdmYWI2MTczMDliNGE4MmExZTY3YTM5MTJiOGQ4NzMiLCJkZWxlZ2F0ZWRfY2hhaW4iOltdLCJzY29wZSI6eyJpbmRhdGEiOlsicmVhZF9iaXRhYmxlIiwicmVhZF9jb250YWN0IiwicmVhZF9jYWxlbmRhciJdfSwiaXAiOiIxMjcuMC4wLjEiLCJwdXJwb3NlIjoiXHU2NTg3XHU2ODYzXHU3NTFmXHU2MjEwXHU1ZGU1XHU1MTc3XHU4YzAzXHU3NTI4IiwiZXhwIjoxNzc4MDU0OTI5fQ.O7oqSsRpmTrTaK9MpEMr7MLh_1CnVgCGEROYDKAlpUs",
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJJQU0tU3lzdGVtIiwiQWdlbnRJRCI6InVzZXJfMTc3ODA1MTMyMl9jMzM0ZDJlMSIsImlhdCI6MTc3ODA2MjY5MSwianRpIjoiNGY1ODExZWJmYjQwNDU1MWI5NDdlZTQxMmM2ZDMxOWQiLCJkZWxlZ2F0ZWRfY2hhaW4iOltdLCJzY29wZSI6eyJpbmRhdGEiOlsicmVhZF9jYWxlbmRhciIsInJlYWRfYml0YWJsZSIsInJlYWRfY29udGFjdCJdfSwiaXAiOiIxMjcuMC4wLjEiLCJwdXJwb3NlIjoiXHU2NTg3XHU2ODYzXHU3NTFmXHU2MjEwXHU1ZGU1XHU1MTc3XHU4YzAzXHU3NTI4IiwidG9rZW5fdHlwZSI6ImR5bmFtaWMiLCJleHAiOjE3NzgwNjYyOTF9.GqmSLUYxF423wvkrHMBKfV7fS0dXjkyR34zZ3BqUjPI",
         "accesstoken_type": "dynamic",
-        "expire_at": 1778054929,
+        "expire_at": 1778066291,
         "granted_scope": {
             "indata": [
+                "read_calendar",
                 "read_bitable",
-                "read_contact",
-                "read_calendar"
+                "read_contact"
             ]
         }
     }

@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAM系统管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sidebar-item.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .log-entry {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .log-entry:hover {
+            background-color: #f9fafb;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .log-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .log-level {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .log-level.INFO {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .log-level.WARN {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .log-level.ERROR {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .log-level.DEBUG {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+        .log-time {
+            font-size: 12px;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+        }
+        .log-type {
+            font-size: 12px;
+            padding: 2px 6px;
+            background-color: #eff6ff;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+        .log-message {
+            font-size: 13px;
+            color: #1f2937;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        .log-detail {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #4b5563;
+            font-family: 'Courier New', monospace;
+            display: none;
+            white-space: pre-wrap;
+        }
+        .log-entry.expanded .log-detail {
+            display: block;
+        }
+        .log-toggle {
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+        .log-entry.expanded .log-toggle {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- 登录页面 -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <i class="fas fa-shield-alt text-5xl text-blue-600 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800">IAM系统管理后台</h1>
+                <p class="text-gray-600 mt-2">请登录以继续</p>
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                    <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入用户名" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入密码" required>
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    <span>用户名或密码错误</span>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200">
+                    登录
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 主页面 -->
+    <div id="main-page" class="hidden min-h-screen">
+        <!-- 顶部导航 -->
+        <nav class="bg-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-2xl text-blue-600 mr-3"></i>
+                        <h1 class="text-xl font-bold text-gray-800">IAM系统管理后台</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-700">欢迎，管理员</span>
+                        <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                            <i class="fas fa-sign-out-alt mr-1"></i>
+                            退出登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 侧边栏 -->
+            <div class="w-64 bg-white shadow-md h-[calc(100vh-4rem)] p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <button class="sidebar-item active w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="dashboard">
+                            <i class="fas fa-tachometer-alt mr-2"></i>
+                            控制台
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="users">
+                            <i class="fas fa-users mr-2"></i>
+                            用户管理
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="bots">
+                            <i class="fas fa-robot mr-2"></i>
+                            机器Agent管理
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="tokens">
+                            <i class="fas fa-key mr-2"></i>
+                            Token管理
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="blacklist">
+                            <i class="fas fa-ban mr-2"></i>
+                            黑名单管理
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="anomalies">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            违规请求
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="logs">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            系统日志
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition duration-200" data-tab="settings">
+                            <i class="fas fa-cog mr-2"></i>
+                            系统设置
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="flex-1 p-6 overflow-auto h-[calc(100vh-4rem)]">
+                <!-- 控制台 -->
+                <div id="dashboard" class="tab-content active fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                    <i class="fas fa-users text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-gray-600 text-sm">总用户数</h3>
+                                    <p class="text-2xl font-bold" id="total-users">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                    <i class="fas fa-robot text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-gray-600 text-sm">总机器Agent数</h3>
+                                    <p class="text-2xl font-bold" id="total-bots">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-key text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-gray-600 text-sm">活跃Token数</h3>
+                                    <p class="text-2xl font-bold" id="active-tokens">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                    <i class="fas fa-ban text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-gray-600 text-sm">黑名单数量</h3>
+                                    <p class="text-2xl font-bold" id="blacklist-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h2 class="text-lg font-semibold mb-4">最近注册</h2>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th class="text-left py-3 px-4">Agent名称</th>
+                                            <th class="text-left py-3 px-4">类型</th>
+                                            <th class="text-left py-3 px-4">注册时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-registrations">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h2 class="text-lg font-semibold mb-4">最近违规</h2>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th class="text-left py-3 px-4">Agent</th>
+                                            <th class="text-left py-3 px-4">违规类型</th>
+                                            <th class="text-left py-3 px-4">时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-anomalies">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户管理 -->
+                <div id="users" class="tab-content fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">用户管理</h2>
+                        <button id="add-user-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                            <i class="fas fa-plus mr-1"></i>
+                            新增用户
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Agent名称</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">AgentID</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">权限</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">注册IP</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">注册时间</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 机器Agent管理 -->
+                <div id="bots" class="tab-content fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">机器Agent管理</h2>
+                        <button id="add-bot-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                            <i class="fas fa-plus mr-1"></i>
+                            新增机器Agent
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Agent名称</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">AgentID</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">权限</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">API地址</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">注册时间</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bots-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Token管理 -->
+                <div id="tokens" class="tab-content fade-in">
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-lg font-semibold mb-4">全局Token授权模式设置</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">全局授权模式</label>
+                                <select id="global-token-mode" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                    <option value="dynamic">全局动态模式（所有Token均为动态类型）</option>
+                                    <option value="static">全局静态模式（所有Token均为静态类型）</option>
+                                    <option value="custom">自定义模式（允许用户申请时指定类型）</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">允许用户自定义Token类型</label>
+                                <div class="flex items-center mt-2">
+                                    <input type="checkbox" id="allow-custom-mode" class="w-5 h-5 mr-2">
+                                    <span>开启后用户可在申请Token时选择动态/静态类型</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">静态Token最长有效期（天）</label>
+                                <input type="number" id="static-token-ttl" min="1" max="365" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="30">
+                                <p class="text-xs text-gray-500 mt-1">范围：1天 ~ 365天，默认30天</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">动态Token最长有效期（小时）</label>
+                                <input type="number" id="dynamic-token-ttl" min="1" max="24" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="24">
+                                <p class="text-xs text-gray-500 mt-1">范围：1小时 ~ 24小时，默认24小时</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button id="save-token-config" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存全局配置
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">Token管理</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Token ID</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">所属Agent</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">类型</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">权限</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">过期时间</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tokens-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 黑名单管理 -->
+                <div id="blacklist" class="tab-content fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">黑名单管理</h2>
+                        <button id="add-blacklist-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                            <i class="fas fa-plus mr-1"></i>
+                            添加到黑名单
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold mb-4 text-red-600">Agent黑名单</h3>
+                            <ul id="agent-blacklist" class="space-y-2">
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold mb-4 text-red-600">IP黑名单</h3>
+                            <ul id="ip-blacklist" class="space-y-2">
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold mb-4 text-red-600">用户黑名单</h3>
+                            <ul id="user-blacklist" class="space-y-2">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 违规请求 -->
+                <div id="anomalies" class="tab-content fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">违规请求监控</h2>
+                        <button id="refresh-anomalies-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                            <i class="fas fa-sync-alt mr-1"></i>
+                            刷新
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">时间</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">用户/Agent</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">调用Bot</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">IP地址</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">违规类型</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">详情</th>
+                                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="anomalies-table">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统日志 -->
+                <div id="logs" class="tab-content fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">系统日志</h2>
+                        <div class="flex space-x-4">
+                            <input type="date" id="log-date" class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <button id="view-logs-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                                <i class="fas fa-search mr-1"></i>
+                                查看日志
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 筛选栏 -->
+                    <div class="bg-white p-4 rounded-lg shadow-md mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">日志类型</label>
+                            <select id="log-type-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="all">全部类型</option>
+                                <option value="audit">审计日志</option>
+                                <option value="registration">注册日志</option>
+                                <option value="apply_token">Token申请日志</option>
+                                <option value="verify_token">Token校验日志</option>
+                                <option value="revoke_token">Token撤销日志</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">日志级别</label>
+                            <select id="log-level-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="all">全部级别</option>
+                                <option value="INFO">INFO</option>
+                                <option value="WARN">WARN</option>
+                                <option value="ERROR">ERROR</option>
+                                <option value="DEBUG">DEBUG</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">关键词搜索</label>
+                            <input type="text" id="log-keyword" placeholder="输入关键词搜索..." class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="filter-logs-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                                <i class="fas fa-filter mr-1"></i>
+                                筛选
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 日志内容区域 -->
+                    <div class="bg-white rounded-lg shadow-md h-[500px] overflow-y-auto" id="log-content">
+                        <div class="p-6 text-center text-gray-500">
+                            请选择日期查看日志
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统设置 -->
+                <div id="settings" class="tab-content fade-in">
+                    <h2 class="text-2xl font-bold mb-6">系统设置</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold mb-4">服务状态</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span>审计服务 (9000端口)</span>
+                                    <span id="audit-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>运行中
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>授权服务 (9001端口)</span>
+                                    <span id="auth-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>运行中
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>身份注册服务 (9002端口)</span>
+                                    <span id="identity-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>运行中
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>管理后台服务 (9005端口)</span>
+                                    <span id="admin-status" class="px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>运行中
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold mb-4">异常检测规则</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span>请求频率限制</span>
+                                    <span>1小时内超过100次加入黑名单</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>连续失败限制</span>
+                                    <span>失败5次加入黑名单</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>异地登录检测</span>
+                                    <span>5个以上不同IP访问加入黑名单</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto fade-in">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 id="modal-title" class="text-xl font-bold">新增用户</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="p-6">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置
+        const API_BASE = {
+            audit: 'http://localhost:9000/IAMsystem/audit',
+            auth: 'http://localhost:9001/IAMsystem/auth',
+            identity: 'http://localhost:9002/IAMsystem/identity',
+            admin: 'http://localhost:9005/IAMsystem/admin'
+        };
+
+        // 登录功能
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin') {
+                localStorage.setItem('isLoggedIn', 'true');
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-page').classList.remove('hidden');
+                initDashboard();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('login-error').classList.add('hidden');
+                }, 3000);
+            }
+        });
+
+        // 退出登录
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('isLoggedIn');
+            document.getElementById('main-page').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        });
+
+        // 侧边栏切换
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const tabId = item.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                
+                if (tabId === 'dashboard') loadDashboardData();
+                if (tabId === 'users') loadUsers();
+                if (tabId === 'bots') loadBots();
+                if (tabId === 'tokens') loadTokenConfig();
+                if (tabId === 'blacklist') loadBlacklist();
+                if (tabId === 'anomalies') loadAnomalies();
+                if (tabId === 'settings') checkServiceStatus();
+            });
+        });
+
+        // 初始化
+        function initDashboard() {
+            loadDashboardData();
+            checkServiceStatus();
+        }
+
+        // 加载控制台数据
+        async function loadDashboardData() {
+            try {
+                const res = await fetch(API_BASE.admin + '/stats');
+                const result = await res.json();
+                
+                if (result.code === 200) {
+                    document.getElementById('total-users').textContent = result.data.total_users;
+                    document.getElementById('total-bots').textContent = result.data.total_bots;
+                    document.getElementById('blacklist-count').textContent = result.data.blacklist_count;
+                    
+                    // 加载最近注册
+                    const recentRegistrations = document.getElementById('recent-registrations');
+                    recentRegistrations.innerHTML = '';
+                    result.data.recent_registrations.forEach(agent => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b';
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${agent.agent_name || agent.Agent_name || '未知'}</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs ${agent.subtype === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${agent.subtype}</span></td>
+                            <td class="py-3 px-4">${new Date(agent.registered_at * 1000).toLocaleString()}</td>
+                        `;
+                        recentRegistrations.appendChild(row);
+                    });
+
+                    // 加载最近违规
+                    const recentAnomalies = document.getElementById('recent-anomalies');
+                    recentAnomalies.innerHTML = '';
+                    try {
+                        const anomaliesRes = await fetch(API_BASE.admin + '/anomalies?days=7');
+                        const anomaliesResult = await anomaliesRes.json();
+                        if (anomaliesResult.code === 200) {
+                            // 只取前5条
+                            const recent5 = anomaliesResult.data.slice(0, 5);
+                            recent5.forEach(log => {
+                                const row = document.createElement('tr');
+                                row.className = 'border-b';
+                                row.innerHTML = `
+                                    <td class="py-3 px-4">
+                                        <div class="font-medium">${log.agent_name || log.Agent_name || '未知用户'}</div>
+                                    <div class="text-xs text-gray-500 font-mono">${log.agent_id || log.AgentID || '-'}</div>
+                                    </td>
+                                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">${log.operation}</span></td>
+                                    <td class="py-3 px-4">${new Date(log.timestamp).toLocaleString()}</td>
+                                `;
+                                recentAnomalies.appendChild(row);
+                            });
+                        }
+                    } catch (e) {
+                        console.error('加载最近违规失败:', e);
+                    }
+                }
+            } catch (error) {
+                console.error('加载控制台数据失败:', error);
+            }
+        }
+
+        // 检查服务状态
+        async function checkServiceStatus() {
+            const services = [
+                { url: API_BASE.audit + '/health', element: 'audit-status' },
+                { url: API_BASE.auth + '/health', element: 'auth-status' },
+                { url: API_BASE.identity + '/health', element: 'identity-status' },
+                { url: API_BASE.admin + '/health', element: 'admin-status' }
+            ];
+            
+            for (const service of services) {
+                try {
+                    const res = await fetch(service.url, { timeout: 3000 });
+                    if (res.ok) {
+                        if (document.getElementById(service.element)) {
+                            document.getElementById(service.element).innerHTML = '<i class="fas fa-check-circle mr-1"></i>运行中';
+                            document.getElementById(service.element).className = 'px-3 py-1 rounded-full bg-green-100 text-green-800';
+                        }
+                    } else {
+                        throw new Error('服务异常');
+                    }
+                } catch (error) {
+                    if (document.getElementById(service.element)) {
+                        document.getElementById(service.element).innerHTML = '<i class="fas fa-times-circle mr-1"></i>未运行';
+                        document.getElementById(service.element).className = 'px-3 py-1 rounded-full bg-red-100 text-red-800';
+                    }
+                }
+            }
+        }
+
+        // 加载用户列表
+        async function loadUsers() {
+            try {
+                const res = await fetch(API_BASE.admin + '/users');
+                const result = await res.json();
+                const table = document.getElementById('users-table');
+                table.innerHTML = '';
+                
+                if (result.code === 200) {
+                    (result.data || []).forEach(user => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${user.agent_name || user.Agent_name || '未知'}</td>
+                        <td class="py-3 px-4 font-mono text-sm">${user.agent_id || '未知ID'}</td>
+                            <td class="py-3 px-4">${JSON.stringify(user.scope)}</td>
+                            <td class="py-3 px-4">${user.ip}</td>
+                            <td class="py-3 px-4">${new Date(user.registered_at * 1000).toLocaleString()}</td>
+                            <td class="py-3 px-4">
+                                <button class="text-red-600 hover:text-red-800 mr-2" onclick="addToBlacklist('agent', '${user.agent_id}')">
+                                    <i class="fas fa-ban"></i> 拉黑
+                                </button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+            }
+        }
+
+        // 加载机器Agent列表
+        async function loadBots() {
+            try {
+                const res = await fetch(API_BASE.admin + '/bots');
+                const result = await res.json();
+                const table = document.getElementById('bots-table');
+                table.innerHTML = '';
+                
+                if (result.code === 200) {
+                    (result.data || []).forEach(bot => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${bot.agent_name || bot.Agent_name || bot.Bot_name || '未知'}</td>
+                        <td class="py-3 px-4 font-mono text-sm">${bot.agent_id || '未知ID'}</td>
+                            <td class="py-3 px-4">${JSON.stringify(bot.scope)}</td>
+                            <td class="py-3 px-4">${bot.api_endpoint || '-'}</td>
+                            <td class="py-3 px-4">${new Date(bot.registered_at * 1000).toLocaleString()}</td>
+                            <td class="py-3 px-4">
+                                <button class="text-red-600 hover:text-red-800 mr-2" onclick="addToBlacklist('agent', '${bot.agent_id}')">
+                                    <i class="fas fa-ban"></i> 拉黑
+                                </button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('加载机器Agent列表失败:', error);
+            }
+        }
+
+        // 加载黑名单
+        async function loadBlacklist() {
+            try {
+                const res = await fetch(API_BASE.admin + '/blacklist');
+                const data = await res.json();
+                
+                const agentList = document.getElementById('agent-blacklist');
+                const ipList = document.getElementById('ip-blacklist');
+                const userList = document.getElementById('user-blacklist');
+                
+                agentList.innerHTML = '';
+                ipList.innerHTML = '';
+                userList.innerHTML = '';
+                
+                data.data?.agents?.forEach(agent => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
+                    li.innerHTML = `
+                        <span class="font-mono text-sm">${agent}</span>
+                        <button class="text-red-600 hover:text-red-800" onclick="removeFromBlacklist('agent', '${agent}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    agentList.appendChild(li);
+                });
+                
+                data.data?.ips?.forEach(ip => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
+                    li.innerHTML = `
+                        <span>${ip}</span>
+                        <button class="text-red-600 hover:text-red-800" onclick="removeFromBlacklist('ip', '${ip}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    ipList.appendChild(li);
+                });
+                
+                data.data?.users?.forEach(user => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
+                    li.innerHTML = `
+                        <span>${user}</span>
+                        <button class="text-red-600 hover:text-red-800" onclick="removeFromBlacklist('user', '${user}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    userList.appendChild(li);
+                });
+                
+            } catch (error) {
+                console.error('加载黑名单失败:', error);
+            }
+        }
+
+        // 加载违规记录
+        async function loadAnomalies() {
+            try {
+                const res = await fetch(API_BASE.admin + '/anomalies?days=7');
+                const data = await res.json();
+                const table = document.getElementById('anomalies-table');
+                table.innerHTML = '';
+                
+                if (data.code === 200) {
+                    data.data.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b hover:bg-gray-50 cursor-pointer';
+                        const logId = 'log-' + Math.random().toString(36).substr(2, 9);
+                        row.onclick = () => {
+                            const detailRow = document.getElementById(logId);
+                            detailRow.classList.toggle('hidden');
+                        };
+                        
+                        row.innerHTML = `
+                            <td class="py-3 px-4">${new Date(log.timestamp).toLocaleString()}</td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium">${log.agent_name || log.Agent_name || '未知用户'}</div>
+                                <div class="text-xs text-gray-500 font-mono">${log.agent_id || log.AgentID || '-'}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium">${log.bot_name || '未知Bot'}</div>
+                                <div class="text-xs text-gray-500 font-mono">${log.bot_id || '-'}</div>
+                            </td>
+                            <td class="py-3 px-4">${log.ip}</td>
+                            <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">${log.operation}</span></td>
+                            <td class="py-3 px-4">${log.detail?.fail_reason || log.fail_reason || '违规操作'}</td>
+                            <td class="py-3 px-4">
+                                <button class="text-red-600 hover:text-red-800 mr-2" onclick="event.stopPropagation(); addToBlacklist('agent', '${log.agent_id || log.bot_id}')">
+                                    <i class="fas fa-ban"></i> 拉黑
+                                </button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                        
+                        // 详情行
+                        const detailRow = document.createElement('tr');
+                        detailRow.id = logId;
+                        detailRow.className = 'border-b bg-gray-50 hidden';
+                        detailRow.innerHTML = `
+                            <td colspan="7" class="py-4 px-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 class="font-semibold mb-2 text-sm text-gray-700">基础信息</h4>
+                                        <div class="space-y-1 text-sm">
+                                            <div><span class="text-gray-500">日志ID:</span> ${log.log_id || '-'}</div>
+                                            <div><span class="text-gray-500">状态:</span> <span class="text-red-600">${log.status}</span></div>
+                                            <div><span class="text-gray-500">Token ID:</span> <span class="font-mono">${log.jti || '-'}</span></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold mb-2 text-sm text-gray-700">权限信息</h4>
+                                        <div class="space-y-1 text-sm">
+                                            <div><span class="text-gray-500">请求权限:</span> ${log.required_scope ? JSON.stringify(log.required_scope, null, 2) : '-'}</div>
+                                            <div><span class="text-gray-500">已有权限:</span> ${log.granted_scope ? JSON.stringify(log.granted_scope, null, 2) : '-'}</div>
+                                            <div><span class="text-gray-500">缺失权限:</span> <span class="text-red-600">${log.missing_scope ? JSON.stringify(log.missing_scope, null, 2) : '-'}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                ${log.detail ? `
+                                <div class="mt-4">
+                                    <h4 class="font-semibold mb-2 text-sm text-gray-700">详细信息</h4>
+                                    <pre class="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-32">${JSON.stringify(log.detail, null, 2)}</pre>
+                                </div>
+                                ` : ''}
+                            </td>
+                        `;
+                        table.appendChild(detailRow);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('加载违规记录失败:', error);
+            }
+        }
+
+        // 添加到黑名单
+        async function addToBlacklist(type, value) {
+            if (confirm(`确定要将${type === 'agent' ? 'Agent' : type === 'ip' ? 'IP' : '用户'} ${value} 加入黑名单吗？`)) {
+                try {
+                    const params = new URLSearchParams();
+                    params.append(`${type}_id` === 'ip_id' ? 'ip' : `${type}_id`, value);
+                    const res = await fetch(API_BASE.admin + '/blacklist/add?' + params, { method: 'POST' });
+                    if (res.ok) {
+                        alert('已加入黑名单');
+                        loadBlacklist();
+                    } else {
+                        alert('操作失败');
+                    }
+                } catch (error) {
+                    alert('操作失败: ' + error.message);
+                }
+            }
+        }
+
+        // 从黑名单移除
+        async function removeFromBlacklist(type, value) {
+            if (confirm(`确定要将${type === 'agent' ? 'Agent' : type === 'ip' ? 'IP' : '用户'} ${value} 从黑名单移除吗？`)) {
+                try {
+                    const params = new URLSearchParams();
+                    params.append(`${type}_id` === 'ip_id' ? 'ip' : `${type}_id`, value);
+                    const res = await fetch(API_BASE.admin + '/blacklist/remove?' + params, { method: 'POST' });
+                    if (res.ok) {
+                        alert('已从黑名单移除');
+                        loadBlacklist();
+                    } else {
+                        alert('操作失败');
+                    }
+                } catch (error) {
+                    alert('操作失败: ' + error.message);
+                }
+            }
+        }
+
+        // 新增用户按钮
+        document.getElementById('add-user-btn').addEventListener('click', () => {
+            document.getElementById('modal-title').textContent = '新增用户';
+            document.getElementById('modal-content').innerHTML = `
+                <form id="add-user-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">用户名称</label>
+                        <input type="text" name="Agent_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">权限配置 (JSON格式)</label>
+                        <textarea name="scope" class="w-full px-4 py-2 border border-gray-300 rounded-lg h-32" required>{
+    "doc": ["read", "write"],
+    "online": ["web_search"]
+}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">IP地址</label>
+                        <input type="text" name="ip" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="127.0.0.1">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            提交
+                        </button>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modal').classList.remove('hidden');
+            
+            document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    Agent_name: formData.get('Agent_name'),
+                    subtype: 'user',
+                    scope: JSON.parse(formData.get('scope')),
+                    ip: formData.get('ip')
+                };
+                
+                try {
+                    const res = await fetch(API_BASE.identity + '/register/user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert(`注册成功！\nAgentID: ${result.data.agent_id}\nAgentSecret: ${result.data.agent_secret}`);
+                        document.getElementById('modal').classList.add('hidden');
+                        loadUsers();
+                        loadDashboardData();
+                    } else {
+                        alert('注册失败: ' + result.message);
+                    }
+                } catch (error) {
+                    alert('注册失败: ' + error.message);
+                }
+            });
+        });
+
+        // 新增机器Agent按钮
+        document.getElementById('add-bot-btn').addEventListener('click', () => {
+            document.getElementById('modal-title').textContent = '新增机器Agent';
+            document.getElementById('modal-content').innerHTML = `
+                <form id="add-bot-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Agent名称</label>
+                        <input type="text" name="Bot_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">权限配置 (JSON格式)</label>
+                        <textarea name="scope" class="w-full px-4 py-2 border border-gray-300 rounded-lg h-32" required>{
+    "online": ["web_search", "fetch_content"],
+    "iam": ["verify_token"]
+}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">API地址</label>
+                        <input type="text" name="api_endpoint" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">IP地址</label>
+                        <input type="text" name="ip" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="127.0.0.1">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            提交
+                        </button>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modal').classList.remove('hidden');
+            
+            document.getElementById('add-bot-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    Bot_name: formData.get('Bot_name'),
+                    scope: JSON.parse(formData.get('scope')),
+                    api_endpoint: formData.get('api_endpoint'),
+                    ip: formData.get('ip')
+                };
+                
+                try {
+                    const res = await fetch(API_BASE.identity + '/register/bot', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert(`注册成功！\nAgentID: ${result.data.agent_id}\nAgentSecret: ${result.data.agent_secret}`);
+                        document.getElementById('modal').classList.add('hidden');
+                        loadBots();
+                        loadDashboardData();
+                    } else {
+                        alert('注册失败: ' + result.message);
+                    }
+                } catch (error) {
+                    alert('注册失败: ' + error.message);
+                }
+            });
+        });
+
+        // 添加黑名单按钮
+        document.getElementById('add-blacklist-btn').addEventListener('click', () => {
+            document.getElementById('modal-title').textContent = '添加到黑名单';
+            document.getElementById('modal-content').innerHTML = `
+                <form id="add-blacklist-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">类型</label>
+                        <select name="type" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="agent">Agent</option>
+                            <option value="ip">IP地址</option>
+                            <option value="user">用户</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">值</label>
+                        <input type="text" name="value" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                            添加
+                        </button>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modal').classList.remove('hidden');
+            
+            document.getElementById('add-blacklist-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const type = formData.get('type');
+                const value = formData.get('value');
+                
+                await addToBlacklist(type, value);
+                document.getElementById('modal').classList.add('hidden');
+            });
+        });
+
+        // 全局存储所有日志
+        let allLogs = [];
+
+        // 查看日志按钮
+        document.getElementById('view-logs-btn').addEventListener('click', async () => {
+            const date = document.getElementById('log-date').value;
+            if (!date) {
+                alert('请选择日期');
+                return;
+            }
+            
+            const formattedDate = date.replace(/-/g, '');
+            try {
+                const res = await fetch(API_BASE.admin + `/logs?date=${formattedDate}`);
+                const result = await res.json();
+                
+                if (result.code === 200) {
+                    allLogs = [];
+                    const logNames = {
+                        'audit': '审计日志',
+                        'registration': '注册日志',
+                        'apply_token': 'Token申请日志',
+                        'verify_token': 'Token校验日志',
+                        'revoke_token': 'Token撤销日志'
+                    };
+                    
+                    // 解析所有日志
+                    for (const [logType, logContent] of Object.entries(result.data)) {
+                        if (!logContent) continue;
+                        
+                        const lines = logContent.trim().split('\n');
+                        lines.forEach(line => {
+                            if (!line) return;
+                            
+                            // 尝试解析JSON格式的日志
+                            let logData = null;
+                            try {
+                                logData = JSON.parse(line);
+                            } catch (e) {
+                                // 非JSON格式的日志，按文本处理
+                                logData = {
+                                    message: line,
+                                    level: 'INFO',
+                                    timestamp: Date.now()
+                                };
+                            }
+                            
+                            allLogs.push({
+                                ...logData,
+                                type: logType,
+                                typeName: logNames[logType] || logType
+                            });
+                        });
+                    }
+                    
+                    // 按时间倒序排序
+                    allLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    
+                    // 渲染日志
+                    renderLogs(allLogs);
+                }
+            } catch (error) {
+                console.error('加载日志失败:', error);
+                alert('加载日志失败: ' + error.message);
+            }
+        });
+
+        // 渲染日志
+        function renderLogs(logs) {
+            const logContent = document.getElementById('log-content');
+            
+            if (logs.length === 0) {
+                logContent.innerHTML = `
+                    <div class="p-6 text-center text-gray-500">
+                        没有找到匹配的日志
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            logs.forEach(log => {
+                const level = log.level || 'INFO';
+                const timestamp = log.timestamp ? new Date(log.timestamp).toLocaleString() : '未知时间';
+                const message = log.message || log.operation || JSON.stringify(log);
+                const detail = log.detail ? JSON.stringify(log.detail, null, 2) : '';
+                
+                html += `
+                    <div class="log-entry" onclick="this.classList.toggle('expanded')">
+                        <div class="log-header">
+                            <div class="log-meta">
+                                <span class="log-level ${level}">${level}</span>
+                                <span class="log-type">${log.typeName}</span>
+                                <span class="log-time">${timestamp}</span>
+                            </div>
+                            <div class="log-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="log-message">${message}</div>
+                        ${detail ? `<div class="log-detail">${detail}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            logContent.innerHTML = html;
+        }
+
+        // 筛选日志
+        document.getElementById('filter-logs-btn').addEventListener('click', () => {
+            const typeFilter = document.getElementById('log-type-filter').value;
+            const levelFilter = document.getElementById('log-level-filter').value;
+            const keyword = document.getElementById('log-keyword').value.toLowerCase();
+            
+            let filteredLogs = allLogs.filter(log => {
+                // 类型筛选
+                if (typeFilter !== 'all' && log.type !== typeFilter) return false;
+                
+                // 级别筛选
+                if (levelFilter !== 'all' && (log.level || 'INFO') !== levelFilter) return false;
+                
+                // 关键词筛选
+                if (keyword) {
+                    const logStr = JSON.stringify(log).toLowerCase();
+                    if (!logStr.includes(keyword)) return false;
+                }
+                
+                return true;
+            });
+            
+            renderLogs(filteredLogs);
+        });
+
+        // 回车键触发筛选
+        document.getElementById('log-keyword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('filter-logs-btn').click();
+            }
+        });
+
+        // 刷新违规记录
+        document.getElementById('refresh-anomalies-btn').addEventListener('click', loadAnomalies);
+
+        // 关闭模态框
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        // 点击模态框外部关闭
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.add('hidden');
+            }
+        });
+
+        // 加载Token全局配置
+        async function loadTokenConfig() {
+            try {
+                const res = await fetch(API_BASE.auth + '/token-config');
+                const result = await res.json();
+                if (result.code === 200) {
+                    const config = result.data;
+                    // 填充表单
+                    document.getElementById('global-token-mode').value = config.global_token_mode;
+                    document.getElementById('allow-custom-mode').checked = config.allow_custom_mode;
+                    // 秒转天/小时
+                    document.getElementById('static-token-ttl').value = Math.floor(config.static_token_max_ttl / 86400);
+                    document.getElementById('dynamic-token-ttl').value = Math.floor(config.dynamic_token_max_ttl / 3600);
+                }
+            } catch (error) {
+                console.error('加载Token配置失败:', error);
+            }
+        }
+
+        // 保存Token全局配置
+        document.getElementById('save-token-config').addEventListener('click', async () => {
+            try {
+                const global_mode = document.getElementById('global-token-mode').value;
+                const allow_custom = document.getElementById('allow-custom-mode').checked;
+                const static_ttl_days = parseInt(document.getElementById('static-token-ttl').value);
+                const dynamic_ttl_hours = parseInt(document.getElementById('dynamic-token-ttl').value);
+
+                // 转换为秒
+                const static_token_max_ttl = static_ttl_days * 86400;
+                const dynamic_token_max_ttl = dynamic_ttl_hours * 3600;
+
+                // 更新配置（这里的管理员账号密码需要替换为实际的管理员AgentID和Secret）
+                const updateRes = await fetch(API_BASE.auth + '/update-token-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agent_id: 'admin',
+                        agent_secret: 'admin',
+                        global_token_mode: global_mode,
+                        allow_custom_mode: allow_custom,
+                        static_token_max_ttl: static_token_max_ttl,
+                        dynamic_token_max_ttl: dynamic_token_max_ttl
+                    })
+                });
+                
+                const result = await updateRes.json();
+                if (updateRes.ok) {
+                    alert('Token全局配置保存成功！');
+                    // 重新加载配置
+                    loadTokenConfig();
+                } else {
+                    alert(`保存失败: ${result.message}`);
+                }
+            } catch (error) {
+                alert(`保存失败: ${error.message}`);
+            }
+        });
+
+        // 页面加载时检查登录状态
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-page').classList.remove('hidden');
+                initDashboard();
+            }
+        });
+    </script>
+</body>
+</html>
