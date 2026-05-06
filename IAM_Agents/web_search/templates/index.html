@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外部检索Agent - 游客身份管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">外部检索Agent - 游客身份管理</h1>
+            
+            <!-- 身份信息卡片 -->
+            <div class="border rounded-lg p-4 mb-6 bg-gray-50">
+                <h2 class="text-lg font-semibold mb-3">当前身份信息</h2>
+                <div id="identity-info" class="space-y-2">
+                    <p class="text-gray-500">尚未注册游客身份，请点击下方按钮注册</p>
+                </div>
+            </div>
+
+            <!-- 操作按钮区域 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <button id="register-btn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition">
+                    注册游客身份
+                </button>
+                <button id="token-btn" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition" disabled>
+                    申请AccessToken
+                </button>
+                <button id="call-indata-btn" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition" disabled>
+                    调用企业数据Agent
+                </button>
+            </div>
+
+            <!-- AccessToken信息 -->
+            <div id="token-section" class="border rounded-lg p-4 mb-6 bg-gray-50 hidden">
+                <h2 class="text-lg font-semibold mb-3">AccessToken信息</h2>
+                <div class="space-y-2">
+                    <p><span class="font-medium">Token:</span> <span id="token-value" class="text-sm text-gray-600 break-all"></span></p>
+                    <p><span class="font-medium">过期时间:</span> <span id="token-expire" class="text-sm text-gray-600"></span></p>
+                </div>
+            </div>
+
+            <!-- 结果展示区域 -->
+            <div class="border rounded-lg p-4 bg-gray-50">
+                <h2 class="text-lg font-semibold mb-3">操作结果</h2>
+                <div id="result-area" class="bg-gray-900 text-green-400 p-4 rounded-lg min-h-[150px] overflow-auto font-mono text-sm">
+                    等待操作...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 本地存储key
+        const STORAGE_KEY = 'visitor_identity';
+        
+        // DOM元素
+        const registerBtn = document.getElementById('register-btn');
+        const tokenBtn = document.getElementById('token-btn');
+        const callIndataBtn = document.getElementById('call-indata-btn');
+        const identityInfo = document.getElementById('identity-info');
+        const tokenSection = document.getElementById('token-section');
+        const tokenValue = document.getElementById('token-value');
+        const tokenExpire = document.getElementById('token-expire');
+        const resultArea = document.getElementById('result-area');
+
+        // 初始化：检查本地存储
+        let identity = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        updateUI();
+
+        // 更新UI状态
+        function updateUI() {
+            if (identity) {
+                identityInfo.innerHTML = `
+                    <p><span class="font-medium">Agent ID:</span> ${identity.agent_id}</p>
+                    <p><span class="font-medium">身份类型:</span> 游客(visitor)</p>
+                    <p><span class="font-medium">注册时间:</span> ${new Date(identity.registered_at * 1000).toLocaleString()}</p>
+                    <p><span class="font-medium">权限范围:</span> ${JSON.stringify(identity.scope)}</p>
+                `;
+                registerBtn.disabled = true;
+                registerBtn.textContent = "已注册";
+                tokenBtn.disabled = false;
+                
+                if (identity.access_token) {
+                    tokenSection.classList.remove('hidden');
+                    tokenValue.textContent = identity.access_token;
+                    tokenExpire.textContent = new Date(identity.token_expire_at * 1000).toLocaleString();
+                    callIndataBtn.disabled = false;
+                }
+            } else {
+                identityInfo.innerHTML = '<p class="text-gray-500">尚未注册游客身份，请点击下方按钮注册</p>';
+                registerBtn.disabled = false;
+                registerBtn.textContent = "注册游客身份";
+                tokenBtn.disabled = true;
+                callIndataBtn.disabled = true;
+                tokenSection.classList.add('hidden');
+            }
+        }
+
+        // 打印结果到界面
+        function logResult(message, isSuccess = true) {
+            const timestamp = new Date().toLocaleString();
+            const prefix = isSuccess ? "✅" : "❌";
+            resultArea.innerHTML = `[${timestamp}] ${prefix} ${message}\n` + resultArea.innerHTML;
+        }
+
+        // 注册游客身份
+        registerBtn.addEventListener('click', async () => {
+            try {
+                logResult("正在注册游客身份...");
+                const response = await fetch('/api/visitor/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    identity = result.data;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+                    logResult(`注册成功！Agent ID: ${identity.agent_id}`);
+                    updateUI();
+                } else {
+                    logResult(`注册失败: ${result.error_message}`, false);
+                }
+            } catch (e) {
+                logResult(`请求失败: ${e.message}`, false);
+            }
+        });
+
+        // 申请AccessToken
+        tokenBtn.addEventListener('click', async () => {
+            try {
+                logResult("正在申请AccessToken...");
+                const response = await fetch('/api/visitor/apply-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agent_id: identity.agent_id,
+                        agent_secret: identity.agent_secret
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    identity.access_token = result.data.access_token;
+                    identity.token_expire_at = result.data.expire_at;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+                    logResult(`Token申请成功，有效期至: ${new Date(result.data.expire_at * 1000).toLocaleString()}`);
+                    updateUI();
+                } else {
+                    logResult(`Token申请失败: ${result.error_message}`, false);
+                }
+            } catch (e) {
+                logResult(`请求失败: ${e.message}`, false);
+            }
+        });
+
+        // 调用企业数据Agent
+        callIndataBtn.addEventListener('click', async () => {
+            try {
+                logResult("正在调用企业数据Agent...");
+                const response = await fetch('/api/visitor/call-indata', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_token: identity.access_token,
+                        query: "测试查询员工信息"
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult(`调用成功！返回数据: ${JSON.stringify(result.data, null, 2)}`);
+                } else {
+                    logResult(`调用失败: ${result.error_message}`, false);
+                }
+            } catch (e) {
+                logResult(`请求失败: ${e.message}`, false);
+            }
+        });
+    </script>
+</body>
+</html>

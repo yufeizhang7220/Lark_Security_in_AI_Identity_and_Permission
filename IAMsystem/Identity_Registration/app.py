@@ -78,12 +78,18 @@ async def register_user(request: Request, req: UserRegisterRequest):
     plain_secret = generate_agent_secret()
     hashed_secret = Storage.hash_secret(plain_secret)
     agent_id = generate_agent_id("user")
+    # visitor身份只能拥有online相关权限，过滤其他权限
+    user_scope = req.scope
+    if req.subtype == "visitor":
+        user_scope = {}
+        if "online" in req.scope:
+            user_scope["online"] = req.scope["online"]
     user_data = {
         "agent_id": agent_id,
         "agent_name": req.Agent_name,
         "subtype": req.subtype,
         "agent_secret": hashed_secret,
-        "scope": req.scope,
+        "scope": user_scope,
         "ip": req.ip,
         "registered_at": int(time.time()),
         "status": "active"
@@ -120,7 +126,7 @@ async def register_user(request: Request, req: UserRegisterRequest):
         "data": {
             "Agent_name": req.Agent_name,
             "subtype": req.subtype,
-            "scope": req.scope,
+            "scope": user_scope,
             "agent_id": agent_id,
             "agent_secret": plain_secret,
             "registered_at": int(time.time())
@@ -170,12 +176,20 @@ async def register_bot(request: Request, req: BotRegisterRequest):
     bot_id = req.Bot_id or generate_agent_id("bot")
     plain_secret = generate_agent_secret()
     hashed_secret = Storage.hash_secret(plain_secret)
+    # 处理sub_scope中的visitor权限，只能拥有online相关权限
+    sub_scope = req.sub_scope or {"user": req.scope, "visitor": {}}
+    if "visitor" in sub_scope:
+        visitor_scope = sub_scope["visitor"]
+        filtered_visitor_scope = {}
+        if "online" in visitor_scope:
+            filtered_visitor_scope["online"] = visitor_scope["online"]
+        sub_scope["visitor"] = filtered_visitor_scope
     bot_data = {
         "bot_id": bot_id,
         "bot_name": req.Bot_name,
         "agent_secret": hashed_secret,
         "scope": req.scope,
-        "sub_scope": req.sub_scope or {"user": req.scope, "visitor": {}},
+        "sub_scope": sub_scope,
         "ip": req.ip,
         "api_endpoint": req.api_endpoint,
         "registered_at": int(time.time()),

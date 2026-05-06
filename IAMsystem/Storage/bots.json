@@ -559,6 +559,67 @@
       "api_endpoint": "http://localhost:8000/test/bot",
       "registered_at": 1777978716,
       "status": "active"
+    },
+    {
+      "bot_id": "bot_1778068028_ea8e8b8d",
+      "bot_name": "ExternalSearchAgent",
+      "agent_secret": "$2b$12$3y6kqNRepYFSHAp4nbT0jeeS.Yr5H4hoQej23/b47pdxLZXhuQc2a",
+      "scope": {
+        "online": [
+          "web_search",
+          "fetch_content",
+          "analyze_content"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "online": [
+            "web_search",
+            "fetch_content"
+          ]
+        },
+        "visitor": {
+          "online": [
+            "web_search"
+          ]
+        }
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:8002/external_search",
+      "registered_at": 1778068028,
+      "status": "active"
+    },
+    {
+      "bot_id": "bot_1778078534_9daab254",
+      "bot_name": "Agent_indata",
+      "agent_secret": "$2b$12$9aAwmPUudWStQb4/svkxR.KXW.Apohs/agr6isogLZGVt/yoLGUoO",
+      "scope": {
+        "indata": [
+          "read_contact",
+          "read_calendar",
+          "read_bitable"
+        ],
+        "doc": [
+          "read"
+        ]
+      },
+      "sub_scope": {
+        "user": {
+          "indata": [
+            "read_contact",
+            "read_calendar",
+            "read_bitable"
+          ],
+          "doc": [
+            "read"
+          ]
+        },
+        "visitor": {}
+      },
+      "ip": "127.0.0.1",
+      "api_endpoint": "http://localhost:9300/Agent_indata/api",
+      "registered_at": 1778078534,
+      "status": "active"
     }
   ]
 }
