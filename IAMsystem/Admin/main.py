@@ -154,31 +154,70 @@ async def get_anomalies(days: int = 7):
     anomalies = []
     today = datetime.now()
     
+    # 所有需要检查的日志类型和路径
+    log_types = [
+        ("audit", os.path.join(LOGS_PATH, "audit_trail_log"), "audit_", True),  # (类型, 目录, 文件名前缀, 是否有前缀)
+        ("apply_token", os.path.join(LOGS_PATH, "Delegated_Authorization_Log", "Apply_Token"), "apply_token_", False),
+        ("verify_token", os.path.join(LOGS_PATH, "Delegated_Authorization_Log", "Verify_Token"), "verify_token_", False),
+        ("revoke_token", os.path.join(LOGS_PATH, "Delegated_Authorization_Log", "Revoke_Token"), "revoke_token_", False),
+        ("registration", os.path.join(LOGS_PATH, "Identity_Registration_Log"), "registration_", False)
+    ]
+    
     for i in range(days):
         date_str = (today.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=i)).strftime("%Y%m%d")
-        audit_log_path = os.path.join(LOGS_PATH, "audit_trail_log", f"audit_{date_str}.log")
         
-        if not os.path.exists(audit_log_path):
-            continue
+        for log_type, log_dir, file_prefix, has_prefix in log_types:
+            log_path = os.path.join(log_dir, f"{file_prefix}{date_str}.log")
             
-        log_content = read_log_file(audit_log_path)
-        for line in log_content.strip().split("\n"):
-            if not line:
+            if not os.path.exists(log_path):
                 continue
-            try:
-                # 日志格式: "时间 - 级别 - JSON内容"，需要先提取JSON部分
-                if " - " in line:
-                    json_part = line.split(" - ", 2)[2]
-                    log_entry = json.loads(json_part)
-                    if log_entry.get("status") in ["blocked", "fail"]:
+                
+            log_content = read_log_file(log_path)
+            for line in log_content.strip().split("\n"):
+                if not line:
+                    continue
+                try:
+                    log_entry = None
+                    # 处理带前缀的日志格式（audit日志）
+                    if has_prefix and " - " in line:
+                        json_part = line.split(" - ", 2)[2]
+                        # 处理单引号问题，替换成合法JSON
+                        json_part = json_part.replace("'", '"')
+                        log_entry = json.loads(json_part)
+                    else:
+                        # 直接JSON格式的日志，处理单引号问题
+                        line = line.replace("'", '"')
+                        log_entry = json.loads(line)
+                    
+                    # 只保留违规记录
+                    if log_entry.get("status") in ["blocked", "fail", "denied"]:
+                        # 统一字段名
+                        if "operation" not in log_entry:
+                            log_entry["operation"] = log_type
+                        # 转换时间戳为毫秒级，方便前端处理
+                        if "timestamp" in log_entry and isinstance(log_entry["timestamp"], int) and log_entry["timestamp"] < 1e12:
+                            log_entry["timestamp"] *= 1000
                         anomalies.append(log_entry)
-            except Exception as e:
-                print(f"解析日志失败: {str(e)}, 行内容: {line[:100]}...")
-                continue
+                except Exception as e:
+                    print(f"解析{log_type}日志失败: {str(e)}, 行内容: {line[:100]}...")
+                    continue
     
     # 按时间倒序排序
     anomalies.sort(key=lambda x: x.get("timestamp", 0), reverse=True)
-    return {"code": 200, "message": "success", "data": anomalies}
+    
+    # 根据log_id去重，避免同一条记录在多个日志文件中重复出现
+    seen_log_ids = set()
+    unique_anomalies = []
+    for anomaly in anomalies:
+        log_id = anomaly.get("log_id")
+        if log_id and log_id not in seen_log_ids:
+            seen_log_ids.add(log_id)
+            unique_anomalies.append(anomaly)
+        elif not log_id:
+            # 没有log_id的记录保留
+            unique_anomalies.append(anomaly)
+    
+    return {"code": 200, "message": "success", "data": unique_anomalies}
 
 @app.get("/IAMsystem/admin/stats", summary="获取统计数据")
 async def get_stats():
