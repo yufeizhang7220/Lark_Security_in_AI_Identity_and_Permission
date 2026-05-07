@@ -708,8 +708,8 @@
                                 row.className = 'border-b';
                                 row.innerHTML = `
                                     <td class="py-3 px-4">
-                                        <div class="font-medium">${log.agent_name || log.Agent_name || '未知用户'}</div>
-                                    <div class="text-xs text-gray-500 font-mono">${log.agent_id || log.AgentID || '-'}</div>
+                                        <div class="font-medium">${log.agent_name || log.Agent_name || log.bot_name || log.Bot_name || '未知用户'}</div>
+                                    <div class="text-xs text-gray-500 font-mono">${log.agent_id || log.AgentID || log.bot_id || log.BotID || '-'}</div>
                                     </td>
                                     <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">${log.operation}</span></td>
                                     <td class="py-3 px-4">${new Date(log.timestamp).toLocaleString()}</td>
@@ -899,8 +899,8 @@
                                 <div class="text-xs text-gray-500 font-mono">${log.agent_id || log.AgentID || '-'}</div>
                             </td>
                             <td class="py-3 px-4">
-                                <div class="font-medium">${log.bot_name || '未知Bot'}</div>
-                                <div class="text-xs text-gray-500 font-mono">${log.bot_id || '-'}</div>
+                                <div class="font-medium">${log.bot_name || log.Bot_name || '未知Bot'}</div>
+                                <div class="text-xs text-gray-500 font-mono">${log.bot_id || log.BotID || '-'}</div>
                             </td>
                             <td class="py-3 px-4">${log.ip}</td>
                             <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">${log.operation}</span></td>

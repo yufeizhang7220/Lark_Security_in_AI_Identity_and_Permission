@@ -228,7 +228,7 @@ async def verify_token(request: Request, req: VerifyTokenRequest):
         # 1. 校验调用方Bot身份和密钥
         bot_agent = get_agent_by_id(req.bot_id)
         # 记录Bot名称
-        log_data["bot_name"] = bot_agent.get("Bot_name") if bot_agent else "未知"
+        log_data["bot_name"] = bot_agent.get("bot_name") if bot_agent else "未知"
         if not bot_agent or bot_agent.get("type") != "bot":
             log_data["fail_reason"] = "调用方Bot不存在或已被禁用"
             write_audit_log("verify_token", log_data)
@@ -253,7 +253,7 @@ async def verify_token(request: Request, req: VerifyTokenRequest):
         
         # 记录Agent名称
         agent = get_agent_by_id(agent_id)
-        log_data["agent_name"] = agent.get("Agent_name") if agent else "未知"
+        log_data["agent_name"] = agent.get("agent_name") if agent else "未知"
         
         # 3. 检查Token是否在黑名单
         if is_token_in_blacklist(jti):
